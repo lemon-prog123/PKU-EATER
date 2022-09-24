@@ -9,5 +9,11 @@
         <module name="BackEnd" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel target="18" />
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="BackEnd" options="-parameters" />
+    </option>
   </component>
 </project>
