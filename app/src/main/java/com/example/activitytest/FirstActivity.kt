@@ -18,6 +18,12 @@ class FirstActivity : AppCompatActivity() {
         val button1:Button = findViewById(R.id.button1)
         val baidu:Button = findViewById(R.id.baidu)
         val button2:Button = findViewById(R.id.button2)
+        val button3:Button = findViewById(R.id.button3)
+        button3.setOnClickListener {
+            val intent = Intent(this, CountActivity::class.java)
+            startActivity(intent)
+        }
+
         /*
         button1.setOnClickListener {    //修改，因为需要双项匹配
             val intent = Intent("com.example.activitytest.ACTION_START")
