@@ -5,7 +5,7 @@ package org.example.service.model;
 public class UserModel {
     private Integer id;
     private String name;
-    private Byte gender;
+    private Integer gender;
     private Integer age;
 
     private String encrptPassword;
@@ -19,7 +19,7 @@ public class UserModel {
     }
 
 
-    public Integer getID(){
+    public Integer getId(){
         return id;
     }
 
@@ -35,11 +35,11 @@ public class UserModel {
         this.name = name;
     }
 
-    public Byte getGender(){
+    public Integer getGender(){
         return gender;
     }
 
-    public void setGender(Byte gender){
+    public void setGender(Integer gender){
         this.gender = gender;
 
     }

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.example.service.UserService;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+//如果不加ResponseBody的话
+//就要用RestController
 @Controller("user")
 @RequestMapping("/user")
 public class UserController {
@@ -31,7 +33,7 @@ public class UserController {
             return null;
         }
         UserVO userVO = new UserVO();
-        BeanUtils.copyProperties(userModel,userVO);
+        BeanUtils.copyProperties(userModel, userVO);
         return userVO;
     }
 }
