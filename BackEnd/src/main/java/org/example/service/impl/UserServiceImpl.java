@@ -1,14 +1,19 @@
 package org.example.service.impl;
 
+import org.apache.commons.lang3.StringUtils;//注意不是mysql里的StringUtils包
 import org.example.dao.PasswordDOMapper;
 import org.example.dao.UserDOMapper;
 import org.example.dataobject.PasswordDO;
 import org.example.dataobject.UserDO;
+import org.example.error.EmBusinessError;
 import org.example.service.model.UserModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.example.service.UserService;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -16,7 +21,7 @@ public class UserServiceImpl implements UserService{
     private UserDOMapper userDOMapper;
 
     @Autowired
-    private PasswordDOMapper PasswordDOMapper;
+    private PasswordDOMapper passwordDOMapper;
 
     @Override
     public UserModel getUserById(Integer id){
@@ -28,7 +33,7 @@ public class UserServiceImpl implements UserService{
         }
 
         //通过用户id获取对应用户的加密密码信息
-        PasswordDO PasswordDO = PasswordDOMapper.selectByUserId(userDO.getId());
+        PasswordDO PasswordDO = passwordDOMapper.selectByUserId(userDO.getId());
 
         return convertFromDataObject(userDO,PasswordDO);
     }
@@ -47,5 +52,51 @@ public class UserServiceImpl implements UserService{
         }
 
         return userModel;
+    }
+
+    //userModel->userDO
+    private UserDO convertFromModel(UserModel userModel) {
+        if(userModel == null) return null;
+        UserDO userDO = new UserDO();
+        BeanUtils.copyProperties(userModel,userDO);
+        return userDO;
+    }
+
+    private PasswordDO convertPasswordFromModel(UserModel userModel) {
+        if(userModel == null) return null;
+        PasswordDO passwordDO = new PasswordDO();
+        passwordDO.setEncrptPassword(userModel.getEncrptPassword());
+        passwordDO.setUsrId(userModel.getId());
+        return passwordDO;
+    }
+
+    @Override
+    @Transactional //同一事务，防止什么用户表插进去了password没插进去
+    public void register(UserModel userModel) {
+        if(userModel == null) {
+            //throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+            //报错
+            return;
+        }
+        if(StringUtils.isEmpty(userModel.getName()) ||
+            userModel.getGender() == null ||
+            userModel.getAge() == null) { //不是合法注册信息
+            //报错
+            return;
+        }
+
+        UserDO userDO = convertFromModel(userModel);//将userModel转为数据库可用的userDO
+        userDOMapper.insertSelective(userDO);
+        //insertSelective不会插入为null的字段，而是将其设为数据库的默认值
+
+        /*
+        一旦insertSelective成功，user表的id就会自增（这需要去UserDOMapper.xml文件中设置id为主键自增）
+        这时候就可以通过userDo进行get了
+        将get到的id赋值给userModel，并传递给convertPasswoedFromModel方法
+         */
+        userModel.setId(userDO.getId());
+
+        PasswordDO passwordDO = convertPasswordFromModel(userModel);
+        passwordDOMapper.insertSelective(passwordDO);
     }
 }
