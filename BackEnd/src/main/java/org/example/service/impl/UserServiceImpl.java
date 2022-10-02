@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService{
         BeanUtils.copyProperties(userDO,userModel);
 
         if(userPasswordDO != null ){
-            userModel.setEncrptPssword(userPasswordDO.getEncrptPassword());
+            userModel.setEncrptPassword(userPasswordDO.getEncrptPassword());
         }
 
         return userModel;

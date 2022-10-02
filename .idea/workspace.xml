@@ -5,20 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="成功连接上数据库服务器">
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/UserVO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/UserService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/jarRepositories.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/UserDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/UserDOMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/UserDO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/UserDO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +25,12 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--follow-tags" />
+        <option name="title" value="Current Branch" />
+      </GitPushTagMode>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -152,7 +146,14 @@
       <option name="project" value="LOCAL" />
       <updated>1664115561415</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="成功连接上数据库服务器">
+      <created>1664692245879</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1664692245879</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

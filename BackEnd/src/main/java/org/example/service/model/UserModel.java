@@ -8,14 +8,14 @@ public class UserModel {
     private Byte gender;
     private Integer age;
 
-    private String encrptPssword;
+    private String encrptPassword;
 
-    public String getEncrptPssword() {
-        return encrptPssword;
+    public String getEncrptPassword() {
+        return encrptPassword;
     }
 
-    public void setEncrptPssword(String encrptPssword) {
-        this.encrptPssword = encrptPssword;
+    public void setEncrptPassword(String encrptPssword) {
+        this.encrptPassword = encrptPssword;
     }
 
 
