@@ -4,8 +4,12 @@ import org.example.response.CommonReturnType;
 
 //全局错误码定义
 public enum EmBusinessError implements CommonError {
-    //10000开头为用户信息相关错误定义
-    USER_NOT_EXIST(10001,"用户不存在")
+    //通用错误类型10001
+    PARAMETER_VALIDATION_ERROR(10001,"参数不合法"),
+    UNKNOWN_ERROR(10002,"未知错误"),
+    //20000开头为用户信息相关错误定义
+    USER_NOT_EXIST(20001,"用户不存在")
+    //可在此补充enum错误值
     ;
 
     private EmBusinessError(int errCode,String errMsg){
@@ -20,16 +24,18 @@ public enum EmBusinessError implements CommonError {
 
     @Override
     public int getErrCode() {
-        return 0;
+        return this.errCode;
     }
 
     @Override
     public String getErrMsg() {
-        return null;
+        return this.errMsg;
     }
 
     @Override
+    //改动对应的errmessage
     public CommonError setErrMsg(String errMsg) {
-        return null;
+        this.errMsg = errMsg;
+        return this;
     }
 }
