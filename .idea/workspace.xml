@@ -5,15 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="完成未经优化的注册">
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/BaseController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/error/BusinessException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/BaseController.class" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/error/BusinessException.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/error/EmBusinessError.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/error/EmBusinessError.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/error/EmBusinessError.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/error/EmBusinessError.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
