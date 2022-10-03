@@ -82,12 +82,13 @@ public class UserController extends BaseController {
      * @param password  密码
      * @return 通用返回对象
      */
-    @RequestMapping(value = "/register")
+    @RequestMapping(value = "/register", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType register(@RequestParam(name="name")String name,
                                      @RequestParam(name="gender")Integer gender,
                                      @RequestParam(name="age")Integer age,
-                                     @RequestParam(name="password")String password) {
+                                     @RequestParam(name="password")String password
+    ) throws BusinessException{
         UserModel userModel = new UserModel();
         userModel.setName(name);
         userModel.setGender(gender);

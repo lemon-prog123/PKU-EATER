@@ -5,6 +5,7 @@ import org.example.dao.PasswordDOMapper;
 import org.example.dao.UserDOMapper;
 import org.example.dataobject.PasswordDO;
 import org.example.dataobject.UserDO;
+import org.example.error.BusinessException;
 import org.example.error.EmBusinessError;
 import org.example.service.model.UserModel;
 import org.springframework.beans.BeanUtils;
@@ -72,21 +73,24 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional //同一事务，防止什么用户表插进去了password没插进去
-    public void register(UserModel userModel) {
+    public void register(UserModel userModel) throws BusinessException{
         if(userModel == null) {
-            //throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
-            //报错
-            return;
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
         if(StringUtils.isEmpty(userModel.getName()) ||
             userModel.getGender() == null ||
             userModel.getAge() == null) { //不是合法注册信息
-            //报错
-            return;
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
 
         UserDO userDO = convertFromModel(userModel);//将userModel转为数据库可用的userDO
-        userDOMapper.insertSelective(userDO);
+        try {
+            userDOMapper.insertSelective(userDO);
+        }catch (DuplicateKeyException ex){
+            // 手动回滚事务
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"手机号已重复注册");
+        }
         //insertSelective不会插入为null的字段，而是将其设为数据库的默认值
 
         /*
