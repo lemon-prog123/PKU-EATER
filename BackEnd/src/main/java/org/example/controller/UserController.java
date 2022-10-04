@@ -82,6 +82,7 @@ public class UserController extends BaseController {
      * @param password  密码
      * @return 通用返回对象
      */
+    //定义请求的方式（POST而不是GET），以及表单上传编码格式（application/x-www-form-urlencoded）
     @RequestMapping(value = "/register", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType register(@RequestParam(name="name")String name,
