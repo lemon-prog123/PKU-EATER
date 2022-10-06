@@ -57,12 +57,16 @@ class RulerView: View {
 
     constructor(mContext: Context, attrs: AttributeSet?) : this(mContext, attrs!!,0)
 
+    override fun setSaveEnabled(enabled: Boolean) {
+        super.setSaveEnabled(enabled)
+    }
     constructor(mContext: Context, attrs: AttributeSet,defStyleAttr:Int) : super(mContext, attrs,defStyleAttr) {
         init(mContext, attrs)
     }
 
     fun init(context: Context, attrs: AttributeSet){
         Log.d(TAG, "init")
+        setSaveEnabled(true)
         mScroller= Scroller(context)
 
         this.mLineSpaceWidth=myfloat(25.0f)
