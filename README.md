@@ -1,5 +1,6 @@
 
-关于post请求，post的请求函数放在app/src/main/java/post.kt
+关于post请求，post的请求函数放在  
+<code>app/src/main/java/post.kt</code>  
 
 示例函数在<code> fun main() </code>    
 函数传参需要<code> url,map<String,String></code>    
