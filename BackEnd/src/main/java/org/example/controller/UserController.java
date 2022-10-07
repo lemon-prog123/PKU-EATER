@@ -14,6 +14,10 @@ import org.example.service.UserService;
 import org.springframework.web.client.HttpServerErrorException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,10 +25,17 @@ import java.util.Map;
 //就要用RestController
 @Controller("user")
 @RequestMapping("/user")
+//@CrossOrigin(allowCredentials = "true", allowedHeaders = "*")
 public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private HttpServletRequest httpServletRequest;
+
+    private HttpSession session;
+
     @RequestMapping("/get")
     @ResponseBody
     public CommonReturnType getUser(@RequestParam(name="id")Integer id) throws BusinessException {
@@ -39,7 +50,6 @@ public class UserController extends BaseController {
 
        //将核心领域模型用户对象转化为可供UI使用的viewobject
        UserVO userVO =  convertFromModel(userModel);
-
 
        //返回通用对象
        return CommonReturnType.create(userVO);
@@ -103,4 +113,37 @@ public class UserController extends BaseController {
         return CommonReturnType.create(null);
     }
 
+    //用户登录接口
+    /**
+     * 用户登录接口
+     * 接收参数统一使用字符串，接收后再进行类型转换
+     *
+     * @param name      姓名
+     * @param password  密码
+     * @return 通用返回对象
+     */
+    @RequestMapping(value = "/login", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonReturnType login(@RequestParam(name="name")String name,
+                                  @RequestParam(name="password")String password)
+            throws BusinessException{
+        // 入参校验
+        if (org.apache.commons.lang3.StringUtils.isEmpty(name)
+                || org.apache.commons.lang3.StringUtils.isEmpty(password)
+        ) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        }
+
+        // 用户登录服务，校验登录是否合法
+        UserModel userModel = userService.validateLogin(name, password);
+
+        // 将登录凭证加入到用户登录成功的session内
+        // 切换web页面的时候，可以不用重复登录
+        session = httpServletRequest.getSession();
+        session.setAttribute("IS_LOGIN", true);
+        session.setAttribute("LOGIN_USER", userModel);
+
+        // 登录成功，只返回success即可
+        return CommonReturnType.create(null);
+    }
 }

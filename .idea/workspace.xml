@@ -4,13 +4,25 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="给注册加上了报错">
+    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="更新README">
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/BaseController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/BaseController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/UserDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/UserDOMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/UserDO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/UserDO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/error/EmBusinessError.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/error/EmBusinessError.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mapping/PasswordDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mapping/PasswordDOMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/UserService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/impl/UserServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/impl/UserServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -62,8 +74,11 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "last_opened_file_path": "D:/big_homework/android/LoginDemo-master",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+    "last_opened_file_path": "D:/big_homework/android/groupwork/ClientEnd",
+    "project.structure.last.edited": "项目",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "configurable.group.editor"
   }
 }]]></component>
   <component name="RecentsManager">
@@ -180,7 +195,14 @@
       <option name="project" value="LOCAL" />
       <updated>1664787083803</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="更新README">
+      <created>1664889901382</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1664889901382</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -200,6 +222,7 @@
     <MESSAGE value="完成未经优化的注册" />
     <MESSAGE value="修正了merge导致的错误" />
     <MESSAGE value="给注册加上了报错" />
-    <option name="LAST_COMMIT_MESSAGE" value="给注册加上了报错" />
+    <MESSAGE value="更新README" />
+    <option name="LAST_COMMIT_MESSAGE" value="更新README" />
   </component>
 </project>

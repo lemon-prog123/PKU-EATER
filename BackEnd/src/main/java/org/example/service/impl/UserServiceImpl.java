@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService{
     private UserDO convertFromModel(UserModel userModel) {
         if(userModel == null) return null;
         UserDO userDO = new UserDO();
-        BeanUtils.copyProperties(userModel,userDO);
+        BeanUtils.copyProperties(userModel, userDO);
         return userDO;
     }
 
@@ -88,8 +88,9 @@ public class UserServiceImpl implements UserService{
             userDOMapper.insertSelective(userDO);
         }catch (DuplicateKeyException ex){
             // 手动回滚事务
+            // DuplicateKeyException：Unique的Key被重复使用
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"手机号已重复注册");
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"用户名已重复注册");
         }
         //insertSelective不会插入为null的字段，而是将其设为数据库的默认值
 
@@ -102,5 +103,24 @@ public class UserServiceImpl implements UserService{
 
         PasswordDO passwordDO = convertPasswordFromModel(userModel);
         passwordDOMapper.insertSelective(passwordDO);
+    }
+
+    @Override
+    public UserModel validateLogin(String name, String password) throws BusinessException{
+        //通过用户名获取用户信息
+        UserDO userDO = userDOMapper.selectByUserName(name);
+        if(userDO == null) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL);
+        }
+        PasswordDO passwordDO = passwordDOMapper.selectByUserId(userDO.getId());
+        UserModel userModel = convertFromDataObject(userDO, passwordDO);
+
+        //比对用户信息内加密的密码是否和传输进来的密码相匹配
+        if(!StringUtils.equals(password, userModel.getEncrptPassword())) {
+            throw new BusinessException(EmBusinessError.USER_LOGIN_FAIL);
+        }
+
+        //返回用户信息
+        return userModel;
     }
 }
