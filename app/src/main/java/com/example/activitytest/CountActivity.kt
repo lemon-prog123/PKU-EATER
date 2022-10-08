@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import com.loper7.date_time_picker.DateTimePicker
+import com.loper7.date_time_picker.DateTimeConfig
 
 class CountActivity : AppCompatActivity() {
     private var mWeightRuler: RulerView? = null
@@ -12,7 +14,7 @@ class CountActivity : AppCompatActivity() {
     private var mTvHeight: TextView? = null
     private var weight: Float = 55f
     private var height: Int = 165
-    fun main_layout()
+    private fun main_layout()
     {
         setContentView(R.layout.activity_main)
         mWeightRuler = findViewById(R.id.ruler_weight)
@@ -30,6 +32,17 @@ class CountActivity : AppCompatActivity() {
             button_back.setOnClickListener {
                 main_layout()
             }
+            val button_next:Button=findViewById(R.id.btn_date)
+            button_next.setOnClickListener {
+                setContentView(R.layout.datapicker)
+                val picker:DateTimePicker=findViewById(R.id.picker)
+                picker.setDisplayType(intArrayOf(
+                    DateTimeConfig.YEAR,//显示年
+                    DateTimeConfig.MONTH,//显示月
+                    DateTimeConfig.DAY))
+                    picker.showLabel(true)
+            }
+
         }
         mWeightRuler!!.setOnValueChangeListener(object : RulerView.OnValueChangeListener {
             override fun onValueChange(value: Float) {
@@ -69,6 +82,18 @@ class CountActivity : AppCompatActivity() {
             button_back.setOnClickListener {
                 main_layout()
             }
+            val button_next:Button=findViewById(R.id.btn_date)
+            button_next.setOnClickListener {
+                setContentView(R.layout.datapicker)
+                val picker:DateTimePicker=findViewById(R.id.picker)
+                picker.setDisplayType(intArrayOf(
+                    DateTimeConfig.YEAR,//显示年
+                    DateTimeConfig.MONTH,//显示月
+                    DateTimeConfig.DAY))//显示日
+
+                picker.showLabel(true)
+            }
+
         }
         //体重的view
         mWeightRuler!!.setOnValueChangeListener(object : RulerView.OnValueChangeListener {

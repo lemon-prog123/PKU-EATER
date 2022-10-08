@@ -281,9 +281,9 @@ class RulerView: View {
     }
 
     private fun notifyValueChange() {
-        if (null != mListener) {
+        //if (null != mListener) {
             mListener.onValueChange(mSelectorValue)
-        }
+        //}
     }
 
     /**

@@ -18,21 +18,39 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
+        android:id="@+id/btn_date"
+        style="?attr/materialButtonOutlinedStyle"
+        android:layout_width="166dp"
+        android:layout_height="70dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="196dp"
+        android:background="@drawable/btn_noraml"
+        android:shadowColor="@color/material_dynamic_primary90"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="2"
+        android:text="Next"
+        app:backgroundTint="@color/material_dynamic_primary90"
+        app:layout_constraintStart_toStartOf="@id/btn_register_info_sex"
+        app:layout_constraintTop_toTopOf="@id/btn_register_info_sex"
+        app:rippleColor="@color/material_dynamic_neutral99" />
+
+    <Button
         android:id="@+id/btn_back"
         style="?attr/materialButtonOutlinedStyle"
         android:layout_width="166dp"
         android:layout_height="70dp"
-        android:layout_marginStart="120dp"
-        android:layout_marginTop="240dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="124dp"
         android:background="@drawable/btn_noraml"
-        android:shadowColor="@color/material_dynamic_tertiary80"
+        android:shadowColor="@color/material_dynamic_tertiary100"
         android:shadowDx="0"
         android:shadowDy="2"
         android:shadowRadius="2"
         android:text="Back"
-        app:backgroundTint="@color/material_dynamic_tertiary80"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_register_info_sex"
+        app:backgroundTint="@color/material_dynamic_tertiary100"
+        app:layout_constraintStart_toStartOf="@id/btn_date"
+        app:layout_constraintTop_toBottomOf="@id/btn_date"
         app:rippleColor="@color/material_dynamic_neutral99" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
