@@ -24,16 +24,16 @@
         android:layout_height="70dp"
         android:layout_marginStart="40dp"
         android:layout_marginTop="196dp"
-        android:background="@drawable/btn_noraml"
-        android:shadowColor="@color/material_dynamic_primary90"
+        android:background="@drawable/btnnoraml"
+        android:shadowColor="@color/black"
         android:shadowDx="0"
         android:shadowDy="2"
         android:shadowRadius="2"
         android:text="Next"
-        app:backgroundTint="@color/material_dynamic_primary90"
+        app:backgroundTint="#C1E8FF"
         app:layout_constraintStart_toStartOf="@id/btn_register_info_sex"
         app:layout_constraintTop_toTopOf="@id/btn_register_info_sex"
-        app:rippleColor="@color/material_dynamic_neutral99" />
+        />
 
     <Button
         android:id="@+id/btn_back"
@@ -42,15 +42,14 @@
         android:layout_height="70dp"
         android:layout_marginStart="0dp"
         android:layout_marginTop="80dp"
-        android:background="@drawable/btn_noraml"
-        android:shadowColor="@color/material_dynamic_tertiary100"
+        android:background="@drawable/btnnoraml"
+        android:shadowColor="@color/black"
         android:shadowDx="0"
         android:shadowDy="2"
         android:shadowRadius="2"
         android:text="Back"
-        app:backgroundTint="@color/material_dynamic_tertiary100"
+        app:backgroundTint="#FFFFFF"
         app:layout_constraintStart_toStartOf="@id/btn_date"
-        app:layout_constraintTop_toBottomOf="@id/btn_date"
-        app:rippleColor="@color/material_dynamic_neutral99" />
+        app:layout_constraintTop_toBottomOf="@id/btn_date" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
