@@ -8,6 +8,8 @@ import org.example.dataobject.UserDO;
 import org.example.error.BusinessException;
 import org.example.error.EmBusinessError;
 import org.example.service.model.UserModel;
+import org.example.validator.ValidationResult;
+import org.example.validator.ValidatorImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -23,6 +25,9 @@ public class UserServiceImpl implements UserService{
 
     @Autowired
     private PasswordDOMapper passwordDOMapper;
+
+    @Autowired
+    private ValidatorImpl validator;
 
     @Override
     public UserModel getUserById(Integer id){
@@ -77,10 +82,14 @@ public class UserServiceImpl implements UserService{
         if(userModel == null) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
-        if(StringUtils.isEmpty(userModel.getName()) ||
-            userModel.getGender() == null ||
-            userModel.getAge() == null) { //不是合法注册信息
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+      //  if(StringUtils.isEmpty(userModel.getName()) ||
+      //      userModel.getGender() == null ||
+      //     userModel.getAge() == null) { //不是合法注册信息
+      //      throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+      //  }
+        ValidationResult result = validator.validate(userModel);
+        if(result.isHasErrors()){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,result.getErrMsg());
         }
 
         UserDO userDO = convertFromModel(userModel);//将userModel转为数据库可用的userDO

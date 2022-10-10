@@ -1,29 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="PKU-EATER:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="更新README">
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/artifacts/PKU_EATER_jar.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__com_fasterxml_classmate_1_5_1.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_jboss_logging_jboss_logging_3_4_3_Final.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/validator/ValidationResult.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/validator/ValidatorImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/META-INF/MANIFEST.MF" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_14_42____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_14_42____.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_14_49____.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_15_10____.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_19_08____.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_21_27____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_21_27____.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_21_33____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_21_33____.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]/UserController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_2_15_10_取消提交了变更_[变更]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_2_19_08_取消提交了变更_[变更]/shelved.patch" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/BackEnd.iml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/BackEnd.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/UserDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/UserDOMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/UserDO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/UserDO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/error/EmBusinessError.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/error/EmBusinessError.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/UserService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mapping/PasswordDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mapping/PasswordDOMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/UserDOMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/UserDOMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/error/EmBusinessError.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/error/EmBusinessError.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/UserService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/impl/UserServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/impl/UserServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/model/UserModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/model/UserModel.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,9 +51,9 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Class" />
         <option value="Interface" />
         <option value="Enum" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -74,8 +89,9 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "last_opened_file_path": "D:/big_homework/android/groupwork/ClientEnd",
-    "project.structure.last.edited": "项目",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "last_opened_file_path": "D:/PKU-EATER",
+    "project.structure.last.edited": "工件",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
     "settings.editor.selected.configurable": "configurable.group.editor"
@@ -95,6 +111,11 @@
       <recent name="C:\Users\m\PKU-EATER\BackEnd\src\main\resources" />
     </key>
   </component>
+  <component name="RunAnythingCache">
+    <option name="myCommands">
+      <command value="mvn clean package -Dmaven.test.skip=true" />
+    </option>
+  </component>
   <component name="RunManager" selected="应用程序.App">
     <configuration name="App" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="org.example.App" />
@@ -108,6 +129,10 @@
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
+    </configuration>
+    <configuration name="PKU-EATER - 副本.jar" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/PKU-EATER-jar/PKU-EATER - 副本.jar" />
+      <method v="2" />
     </configuration>
     <configuration name="mybatis-generator" type="MavenRunConfiguration" factoryName="Maven">
       <MavenSettings>
@@ -135,12 +160,14 @@
       <method v="2" />
     </configuration>
     <list>
+      <item itemvalue="JAR 应用程序.PKU-EATER - 副本.jar" />
       <item itemvalue="Maven.mybatis-generator" />
       <item itemvalue="应用程序.App" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="应用程序.App" />
+        <item itemvalue="JAR 应用程序.PKU-EATER - 副本.jar" />
       </list>
     </recent_temporary>
   </component>
@@ -210,7 +237,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="origin/main" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
