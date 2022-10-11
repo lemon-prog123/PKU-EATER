@@ -1,0 +1,39 @@
+<changelist name="在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]" date="1665408032567" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/shelved.patch" />
+  <option name="DESCRIPTION" value="在进行更新之前于 2022/10/10 21:20 取消提交了变更 [变更]" />
+  <binary>
+    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/service/impl/UserServiceImpl.class" />
+    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/service/impl/UserServiceImpl.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserServiceImpl.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/App.class" />
+    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/App.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/App.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/controller/UserController.class" />
+    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/controller/UserController.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserController.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/error/EmBusinessError.class" />
+    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/error/EmBusinessError.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/EmBusinessError.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/dao/UserDOMapper.class" />
+    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/dao/UserDOMapper.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserDOMapper.class" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value=".idea/shelf/在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]/UserController.class" />
+    <option name="AFTER_PATH" />
+    <option name="SHELVED_PATH" />
+  </binary>
+  <binary>
+    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/service/UserService.class" />
+    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/service/UserService.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserService.class" />
+  </binary>
+</changelist>
