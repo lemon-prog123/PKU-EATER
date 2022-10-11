@@ -82,15 +82,12 @@ public class UserServiceImpl implements UserService{
         if(userModel == null) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
-      //  if(StringUtils.isEmpty(userModel.getName()) ||
-      //      userModel.getGender() == null ||
-      //     userModel.getAge() == null) { //不是合法注册信息
-      //      throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
-      //  }
-        ValidationResult result = validator.validate(userModel);
-        if(result.isHasErrors()){
-            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,result.getErrMsg());
-        }
+        //if(StringUtils.isEmpty(userModel.getName()) ||
+        //   userModel.getGender() == null ||
+        //   userModel.getAge() == null) { //不是合法注册信息
+         //   throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        //}
+
 
         UserDO userDO = convertFromModel(userModel);//将userModel转为数据库可用的userDO
         try {
@@ -103,6 +100,11 @@ public class UserServiceImpl implements UserService{
         }
         //insertSelective不会插入为null的字段，而是将其设为数据库的默认值
 
+        //检测除重复注册外的其他错误信息
+        ValidationResult result = validator.validate(userModel);
+        if(result.isHasErrors()){
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,result.getErrMsg());
+        }
         /*
         一旦insertSelective成功，user表的id就会自增（这需要去UserDOMapper.xml文件中设置id为主键自增）
         这时候就可以通过userDo进行get了
