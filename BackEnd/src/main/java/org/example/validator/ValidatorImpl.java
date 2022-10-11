@@ -1,7 +1,9 @@
 package org.example.validator;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -12,7 +14,7 @@ import java.util.Set;
 @Component
 public class ValidatorImpl implements InitializingBean {
 
-
+    @Autowired
     private Validator validator;
 
     //实现校验方法并返回校验结果
@@ -27,7 +29,7 @@ public class ValidatorImpl implements InitializingBean {
                 String errMsg = constraintViolation.getMessage();
                //获取发生错误的字段
                 String propertyName = constraintViolation.getPropertyPath().toString();
-                result.getErrorMsgMap().put(propertyName,errMsg);
+                result.getErrorMsgMap().put(propertyName, errMsg);
             });
         }
         return result;
