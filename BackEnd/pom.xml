@@ -203,8 +203,9 @@
 				<configuration>
 					<!-- verbose : 冗余的 ， 允许移动生成的文件 -->
 					<verbose>true</verbose>
-					<!-- 新生成的覆盖旧生成的，实际工作中慎用 -->
-					<overwrite>true</overwrite>
+					<!-- 本来是新生成的覆盖旧生成的，实际工作中慎用 -->
+					<!-- 添加菜品表后此处已经改成了不允许覆盖-->
+					<overwrite>false</overwrite>
 					<!-- 指定mybatis配置文件的路径 -->
 					<configurationFile>src/main/resources/mybatis-generator.xml</configurationFile>
 				</configuration>
