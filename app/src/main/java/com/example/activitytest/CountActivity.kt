@@ -7,6 +7,8 @@ import android.view.ViewDebug.IntToString
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
+import com.example.activitytest.data.Data
 import com.loper7.date_time_picker.DateTimePicker
 import com.loper7.date_time_picker.DateTimeConfig
 import java.util.Calendar
@@ -26,6 +28,12 @@ class CountActivity : AppCompatActivity() {
     private var year:Int=0
     private var date:Date=Date(0)
 
+    private val permissions = arrayOf(
+        android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.READ_EXTERNAL_STORAGE,
+        android.Manifest.permission.READ_CONTACTS, android.Manifest.permission.WRITE_CONTACTS,
+        android.Manifest.permission.MANAGE_EXTERNAL_STORAGE
+    )
+
     private fun dateLayout()
     {
         setContentView(R.layout.datapicker)
@@ -34,6 +42,7 @@ class CountActivity : AppCompatActivity() {
             DateTimeConfig.YEAR,//显示年
             DateTimeConfig.MONTH,//显示月
             DateTimeConfig.DAY))
+
         picker.showLabel(true)
         picker.setOnDateTimeChangedListener {
             var calendar  = Calendar.getInstance()
@@ -81,12 +90,21 @@ class CountActivity : AppCompatActivity() {
     private fun mainLayout()
     {
         setContentView(R.layout.activity_main)
+        ActivityCompat.requestPermissions(this, permissions, 321)
+
+        var globalFile= Data
+        val userName=globalFile.getUserName()
+        val password=globalFile.getPassword()
+
         mWeightRuler = findViewById(R.id.ruler_weight)
         mHeightRuler = findViewById(R.id.ruler_height)
         mTvWeight= findViewById(R.id.tv_weight)
         mTvHeight= findViewById(R.id.tv_height)
         val button1: Button = findViewById(R.id.button1)
         val button_skip:Button=findViewById(R.id.outlinedButton)
+        val text:TextView=findViewById(R.id.textView)
+        text.setText(userName)
+
         button1.setOnClickListener {
             finish()
         }
