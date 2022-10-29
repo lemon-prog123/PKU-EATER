@@ -1,11 +1,11 @@
 package com.example.activitytest
 
+import android.util.Log
+import com.example.activitytest.data.Data
+import com.example.activitytest.data.PostData
+import com.google.gson.Gson
 import okhttp3.*
-import org.json.JSONObject
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
 import okio.IOException
-import kotlin.concurrent.thread
 
 private fun simpleDealData(response: Response): String = StringBuilder().apply {
     append("\n\t")
@@ -27,37 +27,56 @@ private fun simpleDealData(response: Response): String = StringBuilder().apply {
     )
 }.toString()
 
-
+@Synchronized
 fun simplePostUseFrom(url: String, params: Map<String,String>? = null) {
     //创建 formBody
-    val formBody = FormBody.Builder()
-        .also { builder ->
-            params?.forEach { (name, value) ->
-                //参数需要 add 进入FormBody.Builder
-                builder.add(name, value)
-            }
-        }.build()
-    val okHttpClient = OkHttpClient()
+    var mydata=Data
+    Thread{
 
-    val request = Request.Builder()
-        .url(url)
-        .post(formBody) //注意：此时formBody以post的形式传入
-        .build()
-    okHttpClient.newCall(request).enqueue(object :Callback {
+        val formBody = FormBody.Builder()
+            .also { builder ->
+                params?.forEach { (name, value) ->
+                    //参数需要 add 进入FormBody.Builder
+                    builder.add(name, value)
+                }
+            }.build()
+        val okHttpClient = OkHttpClient()
+
+        val request = Request.Builder()
+            .url(url)
+            .post(formBody) //注意：此时formBody以post的形式传入
+            .build()
+
+        val call = okHttpClient.newCall(request)
+        try {
+            val responses = call.execute()
+            Log.d("Post", "post同步请求" + (responses.body?.string() ?: ""))
+            //val response=Gson().fromJson(responses.body.toString(),PostData::class.java)
+            //println(response.status)
+        } catch (e: Throwable) {
+            Log.d("Post", "failed")
+            println(e.toString())
+            e.printStackTrace()
+        }
+
+
+        /*okHttpClient.newCall(request).enqueue(object :Callback {
         override fun onFailure(call: Call, e: IOException) {
             print("go failure ${e.message}")
         }
-
         override fun onResponse(call: Call, response: Response) {
             val msg = if (response.isSuccessful) {
-                simpleDealData(response)
+                val msg=(response.body?.string() ?: "")
+                Log.d("Post",msg)
+
             } else {
                 "failure code:${response.code} message:${response.message}"
             }
-            print(msg)
-        }
 
-    })
+        }
+    })*/
+    }.start()
+
 }
 
 

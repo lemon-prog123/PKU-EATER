@@ -3,6 +3,7 @@ package com.example.activitytest.data
 import android.content.ContentValues
 import android.os.Environment
 import android.util.Log
+import com.google.gson.Gson
 import java.io.*
 
 
@@ -13,8 +14,10 @@ object Data {
     private var password:CharSequence="123456"
     private var userDataFile:String = ""
     private var dataDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).path + "/PKU_Eater")
+    private var user=User("Lemon","123456")
+    private var errorCode:Int=1
 
-    private val fileName = "userData.txt"
+    private val fileName = "userData.json"
     fun getTrueWeight():CharSequence{
         val fileExist = createNewFile(dataDir, fileName)//打开/创建文件
         if(fileExist == -1){//如果文件不存在
@@ -69,57 +72,35 @@ object Data {
         write2File(userDataFile, "height "+trueHeight.toString()+" ")
     }
     fun getUserName():CharSequence{
-        val fileExist = createNewFile(dataDir, fileName)//打开/创建文件
-        if(fileExist == -1){//如果文件不存在
-            return userName
-        }
-        //读取文件中的全部内容
-        val retval = getContentFromSdcard(userDataFile)
-        if(retval != null) {
-
-            val dataPart = retval.split(" ")
-            var lastItem:String = ""
-            for(item in dataPart) {
-                if (lastItem == "Username") {
-                    userName = item
-                }
-                lastItem = item
-            }
-        }
-        return userName
+        val content = File(userDataFile).readText()
+        val nowUser=Gson().fromJson(content, User::class.java)
+        return nowUser.username
     }
-    fun getPassword():CharSequence{
-        val fileExist = createNewFile(dataDir, fileName)//打开/创建文件
-        if(fileExist == -1){//如果文件不存在
-            return password
-        }
-        //读取文件中的全部内容
-        val retval = getContentFromSdcard(userDataFile)
-        if(retval != null) {
-            val dataPart = retval.split(" ")
-            var lastItem:String = ""
-            for(item in dataPart) {
-                if (lastItem == "Password") {
-                    password = item
-                }
-                lastItem = item
-            }
-        }
-        return password
+    fun getPassword():String{
+        val content = File(userDataFile).readText()
+        val nowUser=Gson().fromJson(content, User::class.java)
+        return nowUser.password
     }
 
+    fun write2Json()
+    {
+        val json=Gson().toJson(user)
+        val fw=FileWriter(userDataFile,false)
+        fw.write(json)
+        fw.close()
+    }
     fun setUserName(seq:CharSequence)
     {
         val fileExist = createNewFile(dataDir, fileName)//打开/创建文件
-        userName=seq
-        write2File(userDataFile, "Username "+userName.toString()+" ")
+        user.username=seq.toString()
+        write2Json()
     }
 
     fun setPassword(seq:CharSequence)
     {
         val fileExist = createNewFile(dataDir, fileName)//打开/创建文件
-        password=seq
-        write2File(userDataFile, "Password "+password.toString()+" ")
+        user.password=seq.toString()
+        write2Json()
     }
     /**
      * 在指定目录下创建文件，若文件不存在，则创建并且返回-1；若已经存在，则不创建且返回0

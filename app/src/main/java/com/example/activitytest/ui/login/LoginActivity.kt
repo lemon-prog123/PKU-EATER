@@ -62,15 +62,16 @@ class LoginActivity : AppCompatActivity() {
 
             loading.visibility = View.GONE
             if (loginResult.error != null) {
+
                 showLoginFailed(loginResult.error)
             }
             if (loginResult.success != null) {
                 updateUiWithUser(loginResult.success)
+                setResult(Activity.RESULT_OK)
+                finish()
             }
-            setResult(Activity.RESULT_OK)
 
             //Complete and destroy login activity once successful
-            finish()
         })
 
         username.afterTextChanged {
@@ -117,6 +118,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {
+
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
 }

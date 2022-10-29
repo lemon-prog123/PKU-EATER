@@ -18,9 +18,8 @@ class LoginDataSource {
             globalFile.setUserName(username)
             globalFile.setPassword(password)
             val map = mapOf("name" to username,"password" to password)
-            val url="http://localhost:8090/user/register"
+            val url="http://47.94.139.212:8080/user/register"
             simplePostUseFrom(url,map)
-
             val fakeUser = LoggedInUser(java.util.UUID.randomUUID().toString(), username)
             return Result.Success(fakeUser)
         } catch (e: Throwable) {
