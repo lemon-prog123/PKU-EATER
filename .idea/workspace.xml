@@ -9,30 +9,8 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="修复BUG">
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/ItemController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/ItemVO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/FoodDOMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/FoodDO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/FoodService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/FoodServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/ItemModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/FoodDOMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_reload4j_2_0_3.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_10_21_20____.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_14_42____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_14_42____.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_21_27____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_21_27____.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_21_33____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_21_33____.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/App.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/EmBusinessError.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserDOMapper.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserServiceImpl.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/shelved.patch" beforeDir="false" />
+    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="数据库内添加了菜品的表单，并在后端添加了菜品相关的创建和浏览逻辑，需要前端关于“添加菜品”的页面（课程进度到4-3）">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mybatis-generator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mybatis-generator.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -235,7 +213,14 @@
       <option name="project" value="LOCAL" />
       <updated>1665392250374</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="数据库内添加了菜品的表单，并在后端添加了菜品相关的创建和浏览逻辑，需要前端关于“添加菜品”的页面（课程进度到4-3）">
+      <created>1667052261137</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1667052261137</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -270,6 +255,7 @@
     <MESSAGE value="给注册加上了报错" />
     <MESSAGE value="更新README" />
     <MESSAGE value="增加了验证优化，对用户输入进行了限制，优化了错误信息的显示" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加了验证优化，对用户输入进行了限制，优化了错误信息的显示" />
+    <MESSAGE value="数据库内添加了菜品的表单，并在后端添加了菜品相关的创建和浏览逻辑，需要前端关于“添加菜品”的页面（课程进度到4-3）" />
+    <option name="LAST_COMMIT_MESSAGE" value="数据库内添加了菜品的表单，并在后端添加了菜品相关的创建和浏览逻辑，需要前端关于“添加菜品”的页面（课程进度到4-3）" />
   </component>
 </project>
