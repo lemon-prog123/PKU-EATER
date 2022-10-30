@@ -11,19 +11,47 @@ import java.io.IOException
 class LoginDataSource {
 
     fun login(username: String, password: String,register:Boolean): Result<LoggedInUser> {
+        val globalFile = Data
         try {
-            Log.d("username",username)
-            Log.d("password",password)
-            val globalFile=Data
-            globalFile.setUserName(username)
-            globalFile.setPassword(password)
-            val map = mapOf("name" to username,"password" to password)
-            val url="http://47.94.139.212:8080/user/register"
-            simplePostUseFrom(url,map)
-            val fakeUser = LoggedInUser(java.util.UUID.randomUUID().toString(), username)
-            return Result.Success(fakeUser)
-        } catch (e: Throwable) {
-            return Result.Error(IOException("Error logging in", e))
+            if (register==false)
+            {
+                Log.d("username", username)
+                Log.d("password", password)
+                globalFile.setUserName(username)
+                globalFile.setPassword(password)
+                val map = mapOf("name" to username, "password" to password)
+                val url = "http://47.94.139.212:8080/user/login"
+                simplePostUseFrom(url, map)
+                Log.d("Finish","login")
+                if (globalFile.getState()=="fail")
+                {
+                    throw IOException("Error Login")
+                }
+                val fakeUser = LoggedInUser(java.util.UUID.randomUUID().toString(), username)
+                return Result.Success(fakeUser)
+            }
+            else
+            {
+                Log.d("register","True")
+                Log.d("username", username)
+                Log.d("password", password)
+                globalFile.setUserName(username)
+                globalFile.setPassword(password)
+                val map = mapOf("name" to username, "password" to password)
+                val url = "http://47.94.139.212:8080/user/register"
+                simplePostUseFrom(url, map)
+                Log.d("Finish","register")
+                if (globalFile.getState()=="fail")
+                {
+                    throw IOException("Error Register")
+                }
+                val fakeUser = LoggedInUser(java.util.UUID.randomUUID().toString(), username)
+                return Result.Success(fakeUser)
+            }
+        } catch (e: Throwable)
+        {
+            Log.d("Error",globalFile.getErrorCode().toString())
+            return Result.Error_msg(globalFile.getErrorCode())
         }
     }
 

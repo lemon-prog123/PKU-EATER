@@ -3,6 +3,7 @@ package com.example.activitytest.data
 import android.content.ContentValues
 import android.os.Environment
 import android.util.Log
+import com.example.activitytest.R
 import com.google.gson.Gson
 import java.io.*
 
@@ -16,8 +17,22 @@ object Data {
     private var dataDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS).path + "/PKU_Eater")
     private var user=User("Lemon","123456")
     private var errorCode:Int=1
-
+    private var postData:PostData=PostData("fail",BaseData(10001,"None"))
     private val fileName = "userData.json"
+    public  val map=mapOf(10001 to R.string.register_wrong, 20002 to R.string.login_wrong)
+    fun setPostData(data:PostData):Int
+    {
+        postData=data
+        return 1
+    }
+    fun getState():String
+    {
+        return postData.status
+    }
+    fun getErrorCode():Int
+    {
+        return postData.data.errCode
+    }
     fun getTrueWeight():CharSequence{
         val fileExist = createNewFile(dataDir, fileName)//打开/创建文件
         if(fileExist == -1){//如果文件不存在
