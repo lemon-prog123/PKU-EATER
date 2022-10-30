@@ -1,0 +1,1578 @@
+Index: BackEnd/src/main/java/org/example/controller/UserController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.example.controller;\r\n\r\nimport org.example.controller.viewobject.UserVO;\r\nimport org.example.error.BusinessException;\r\nimport org.example.error.EmBusinessError;\r\nimport org.example.response.CommonReturnType;\r\nimport org.example.service.UserService;\r\nimport org.example.service.model.UserModel;\r\nimport org.springframework.beans.BeanUtils;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.http.HttpStatus;\r\nimport org.springframework.stereotype.Controller;\r\nimport org.springframework.web.bind.annotation.*;\r\n\r\nimport javax.servlet.http.HttpServletRequest;\r\nimport javax.servlet.http.HttpSession;\r\nimport java.util.HashMap;\r\nimport java.util.Map;\r\n\r\n//如果不加ResponseBody的话\r\n//就要用RestController\r\n@Controller(\"user\")\r\n@RequestMapping(\"/user\")\r\n//@CrossOrigin(allowCredentials = \"true\", allowedHeaders = \"*\")\r\npublic class UserController extends BaseController {\r\n\r\n    @Autowired\r\n    private UserService userService;\r\n\r\n    @Autowired\r\n    private HttpServletRequest httpServletRequest;\r\n\r\n    private HttpSession session;\r\n\r\n    @RequestMapping(\"/get\")\r\n    @ResponseBody\r\n    public CommonReturnType getUser(@RequestParam(name=\"id\")Integer id) throws BusinessException {\r\n        //调用service服务获取对应id的用户对象并返回给前端\r\n       UserModel userModel = userService.getUserById(id);\r\n\r\n       //若获取的对应用户信息不存在\r\n        if(userModel == null){\r\n\r\n            throw new BusinessException(EmBusinessError.USER_NOT_EXIST);\r\n        }\r\n\r\n       //将核心领域模型用户对象转化为可供UI使用的viewobject\r\n       UserVO userVO =  convertFromModel(userModel);\r\n\r\n       //返回通用对象\r\n       return CommonReturnType.create(userVO);\r\n    }\r\n\r\n    private UserVO convertFromModel(UserModel userModel){\r\n        if(userModel == null){\r\n            return null;\r\n        }\r\n        UserVO userVO = new UserVO();\r\n        BeanUtils.copyProperties(userModel, userVO);\r\n        return userVO;\r\n    }\r\n\r\n\r\n    //定义exceptionhandler解决未被controller层吸收的exception\r\n    @ExceptionHandler(Exception.class)\r\n    @ResponseStatus(HttpStatus.OK)\r\n    @ResponseBody\r\n    public Object handlerException(HttpServletRequest request, Exception ex){\r\n        Map<String,Object> responseData = new HashMap<>();\r\n        if(ex instanceof BusinessException){\r\n            BusinessException businessException = (BusinessException)ex;\r\n            responseData.put(\"errCode\",businessException.getErrCode());\r\n            responseData.put(\"errMsg\",businessException.getErrMsg());\r\n        }else{\r\n            responseData.put(\"errCode\",EmBusinessError.UNKNOWN_ERROR.getErrCode());\r\n            responseData.put(\"errMsg\",EmBusinessError.UNKNOWN_ERROR.getErrMsg());\r\n        }\r\n        return CommonReturnType.create(responseData,\"fail\");\r\n    }\r\n\r\n    /**\r\n     * 用户注册接口\r\n     * 接收参数统一使用字符串，接收后再进行类型转换\r\n     *\r\n     * @param name      姓名\r\n     * @param age    年龄\r\n     * @param gender 性别\r\n     * @param password  密码\r\n     * @return 通用返回对象\r\n     */\r\n    //定义请求的方式（POST而不是GET），以及表单上传编码格式（application/x-www-form-urlencoded）\r\n    @RequestMapping(value = \"/register\", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})\r\n    @ResponseBody\r\n    public CommonReturnType register(@RequestParam(name=\"name\")String name,\r\n                                     @RequestParam(name=\"gender\")Integer gender,\r\n                                     @RequestParam(name=\"age\")Integer age,\r\n                                     @RequestParam(name=\"password\")String password\r\n    ) throws BusinessException{\r\n        UserModel userModel = new UserModel();\r\n        userModel.setName(name);\r\n        userModel.setGender(gender);\r\n        userModel.setAge(age);\r\n        //密码按道理是需要加密的，目前暂不加密\r\n        //userModel.setEncrptPassword(MD5Encoder.encode(password.getBytes()));\r\n        userModel.setEncrptPassword(password);\r\n\r\n        userService.register(userModel);\r\n\r\n        return CommonReturnType.create(null);\r\n    }\r\n\r\n    //用户登录接口\r\n    /**\r\n     * 用户登录接口\r\n     * 接收参数统一使用字符串，接收后再进行类型转换\r\n     *\r\n     * @param name      姓名\r\n     * @param password  密码\r\n     * @return 通用返回对象\r\n     */\r\n    @RequestMapping(value = \"/login\", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})\r\n    @ResponseBody\r\n    public CommonReturnType login(@RequestParam(name=\"name\")String name,\r\n                                  @RequestParam(name=\"password\")String password)\r\n            throws BusinessException{\r\n        // 入参校验\r\n        if (org.apache.commons.lang3.StringUtils.isEmpty(name)\r\n                || org.apache.commons.lang3.StringUtils.isEmpty(password)\r\n        ) {\r\n            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);\r\n        }\r\n\r\n        // 用户登录服务，校验登录是否合法\r\n        UserModel userModel = userService.validateLogin(name, password);\r\n\r\n        // 将登录凭证加入到用户登录成功的session内\r\n        // 切换web页面的时候，可以不用重复登录\r\n        session = httpServletRequest.getSession();\r\n        session.setAttribute(\"IS_LOGIN\", true);\r\n        session.setAttribute(\"LOGIN_USER\", userModel);\r\n\r\n        // 登录成功，只返回success即可\r\n        return CommonReturnType.create(null);\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BackEnd/src/main/java/org/example/controller/UserController.java b/BackEnd/src/main/java/org/example/controller/UserController.java
+--- a/BackEnd/src/main/java/org/example/controller/UserController.java	(revision 615128b96fd1654bca46e35e849fed1b3de5a7b8)
++++ b/BackEnd/src/main/java/org/example/controller/UserController.java	(date 1667044080296)
+@@ -83,23 +83,17 @@
+      * 接收参数统一使用字符串，接收后再进行类型转换
+      *
+      * @param name      姓名
+-     * @param age    年龄
+-     * @param gender 性别
+      * @param password  密码
+      * @return 通用返回对象
+      */
+     //定义请求的方式（POST而不是GET），以及表单上传编码格式（application/x-www-form-urlencoded）
+     @RequestMapping(value = "/register", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+     @ResponseBody
+-    public CommonReturnType register(@RequestParam(name="name")String name,
+-                                     @RequestParam(name="gender")Integer gender,
+-                                     @RequestParam(name="age")Integer age,
+-                                     @RequestParam(name="password")String password
++    public CommonReturnType register(@RequestParam(required=false, name="name")String name,
++                                     @RequestParam(required=false, name="password")String password
+     ) throws BusinessException{
+         UserModel userModel = new UserModel();
+         userModel.setName(name);
+-        userModel.setGender(gender);
+-        userModel.setAge(age);
+         //密码按道理是需要加密的，目前暂不加密
+         //userModel.setEncrptPassword(MD5Encoder.encode(password.getBytes()));
+         userModel.setEncrptPassword(password);
+Index: .idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/shelved.patch
+===================================================================
+diff --git a/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/shelved.patch b/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/shelved.patch
+deleted file mode 100644
+--- a/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/shelved.patch	(revision 615128b96fd1654bca46e35e849fed1b3de5a7b8)
++++ /dev/null	(revision 615128b96fd1654bca46e35e849fed1b3de5a7b8)
+@@ -1,1347 +0,0 @@
+-Index: BackEnd/src/main/resources/mapping/UserDOMapper.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\r\n<mapper namespace=\"org.example.dao.UserDOMapper\">\r\n  <resultMap id=\"BaseResultMap\" type=\"org.example.dataobject.UserDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    <id column=\"id\" jdbcType=\"INTEGER\" property=\"id\" />\r\n    <result column=\"name\" jdbcType=\"VARCHAR\" property=\"name\" />\r\n    <result column=\"gender\" jdbcType=\"INTEGER\" property=\"gender\" />\r\n    <result column=\"age\" jdbcType=\"INTEGER\" property=\"age\" />\r\n  </resultMap>\r\n  <sql id=\"Base_Column_List\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    id, name, gender, age\r\n  </sql>\r\n  <select id=\"selectByPrimaryKey\" parameterType=\"java.lang.Integer\" resultMap=\"BaseResultMap\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    select \r\n    <include refid=\"Base_Column_List\" />\r\n    from user_info\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </select>\r\n  <delete id=\"deleteByPrimaryKey\" parameterType=\"java.lang.Integer\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    delete from user_info\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </delete>\r\n  <!--根据Name来查找表项-->\r\n  <select id=\"selectByUserName\" resultMap=\"BaseResultMap\">\r\n    select\r\n    <include refid=\"Base_Column_List\" />\r\n    from user_info\r\n    where name = #{name,jdbcType=VARCHAR}\r\n  </select>\r\n  <insert id=\"insert\" parameterType=\"org.example.dataobject.UserDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    insert into user_info (id, name, gender, \r\n      age)\r\n    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER}, \r\n      #{age,jdbcType=INTEGER})\r\n  </insert>\r\n  <insert id=\"insertSelective\" parameterType=\"org.example.dataobject.UserDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    insert into user_info\r\n    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\r\n      <if test=\"id != null\">\r\n        id,\r\n      </if>\r\n      <if test=\"name != null\">\r\n        name,\r\n      </if>\r\n      <if test=\"gender != null\">\r\n        gender,\r\n      </if>\r\n      <if test=\"age != null\">\r\n        age,\r\n      </if>\r\n    </trim>\r\n    <trim prefix=\"values (\" suffix=\")\" suffixOverrides=\",\">\r\n      <if test=\"id != null\">\r\n        #{id,jdbcType=INTEGER},\r\n      </if>\r\n      <if test=\"name != null\">\r\n        #{name,jdbcType=VARCHAR},\r\n      </if>\r\n      <if test=\"gender != null\">\r\n        #{gender,jdbcType=INTEGER},\r\n      </if>\r\n      <if test=\"age != null\">\r\n        #{age,jdbcType=INTEGER},\r\n      </if>\r\n    </trim>\r\n  </insert>\r\n  <update id=\"updateByPrimaryKeySelective\" parameterType=\"org.example.dataobject.UserDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    update user_info\r\n    <set>\r\n      <if test=\"name != null\">\r\n        name = #{name,jdbcType=VARCHAR},\r\n      </if>\r\n      <if test=\"gender != null\">\r\n        gender = #{gender,jdbcType=INTEGER},\r\n      </if>\r\n      <if test=\"age != null\">\r\n        age = #{age,jdbcType=INTEGER},\r\n      </if>\r\n    </set>\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </update>\r\n  <update id=\"updateByPrimaryKey\" parameterType=\"org.example.dataobject.UserDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    update user_info\r\n    set name = #{name,jdbcType=VARCHAR},\r\n      gender = #{gender,jdbcType=INTEGER},\r\n      age = #{age,jdbcType=INTEGER}\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </update>\r\n\r\n  <!-- 需要手动指定  keyProperty=\"id\" useGeneratedKeys=\"true\" -->\r\n  <!-- insertSelective和单纯的insert相比，前者更有优势 -->\r\n  <!-- 因为，如果没有指定对应字段，则会使用设计数据库时的默认字段 -->\r\n  <!-- 而我们在设计数据库时，将默认字段都not null -->\r\n  <!-- 这样对Java程序友好一些 -->\r\n</mapper>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/BackEnd/src/main/resources/mapping/UserDOMapper.xml b/BackEnd/src/main/resources/mapping/UserDOMapper.xml
+---- a/BackEnd/src/main/resources/mapping/UserDOMapper.xml	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/src/main/resources/mapping/UserDOMapper.xml	(date 1665386381733)
+-@@ -5,7 +5,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     <id column="id" jdbcType="INTEGER" property="id" />
+-     <result column="name" jdbcType="VARCHAR" property="name" />
+-@@ -16,7 +16,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     id, name, gender, age
+-   </sql>
+-@@ -24,7 +24,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     select 
+-     <include refid="Base_Column_List" />
+-@@ -35,34 +35,27 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     delete from user_info
+-     where id = #{id,jdbcType=INTEGER}
+-   </delete>
+--  <!--根据Name来查找表项-->
+--  <select id="selectByUserName" resultMap="BaseResultMap">
+--    select
+--    <include refid="Base_Column_List" />
+--    from user_info
+--    where name = #{name,jdbcType=VARCHAR}
+--  </select>
+-   <insert id="insert" parameterType="org.example.dataobject.UserDO">
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     insert into user_info (id, name, gender, 
+-       age)
+-     values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER}, 
+-       #{age,jdbcType=INTEGER})
+-   </insert>
+--  <insert id="insertSelective" parameterType="org.example.dataobject.UserDO">
+-+  <insert id="insertSelective" parameterType="org.example.dataobject.UserDO" keyProperty="id" useGeneratedKeys="true">
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     insert into user_info
+-     <trim prefix="(" suffix=")" suffixOverrides=",">
+-@@ -98,7 +91,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     update user_info
+-     <set>
+-@@ -118,7 +111,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     update user_info
+-     set name = #{name,jdbcType=VARCHAR},
+-@@ -126,6 +119,13 @@
+-       age = #{age,jdbcType=INTEGER}
+-     where id = #{id,jdbcType=INTEGER}
+-   </update>
+-+  <!--根据Name来查找表项-->
+-+  <select id="selectByUserName" resultMap="BaseResultMap">
+-+    select
+-+    <include refid="Base_Column_List" />
+-+    from user_info
+-+    where name = #{name,jdbcType=VARCHAR}
+-+  </select>
+- 
+-   <!-- 需要手动指定  keyProperty="id" useGeneratedKeys="true" -->
+-   <!-- insertSelective和单纯的insert相比，前者更有优势 -->
+-Index: BackEnd/src/main/java/org/example/App.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>\r\npackage org.example;\r\n\r\nimport org.example.dao.UserDOMapper;\r\nimport org.example.dataobject.UserDO;\r\nimport org.mybatis.spring.annotation.MapperScan;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.boot.SpringApplication;\r\nimport org.springframework.boot.autoconfigure.EnableAutoConfiguration;\r\nimport org.springframework.boot.autoconfigure.SpringBootApplication;\r\nimport org.springframework.web.bind.annotation.RequestMapping;\r\nimport org.springframework.web.bind.annotation.RestController;\r\n\r\n@SpringBootApplication(scanBasePackages = {\"org.example\"})\r\n@RestController\r\n@MapperScan(\"org.example.dao\")\r\npublic class App {\r\n\r\n    @Autowired\r\n    private UserDOMapper userDOMapper;\r\n\r\n    @RequestMapping(\"/\")\r\n    public String hello() {\r\n        UserDO userDO = userDOMapper.selectByPrimaryKey(1);\r\n        if(userDO == null) {\r\n            return \"用户不存在.\";\r\n        }\r\n        else {\r\n            return userDO.getName();\r\n        }\r\n    }\r\n\r\n    public static void main(String[] args) {\r\n        System.out.println(\"Hello World!\");\r\n        SpringApplication.run(App.class, args);\r\n    }\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/BackEnd/src/main/java/org/example/App.java b/BackEnd/src/main/java/org/example/App.java
+---- a/BackEnd/src/main/java/org/example/App.java	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/src/main/java/org/example/App.java	(date 1665382154390)
+-@@ -21,13 +21,14 @@
+- 
+-     @RequestMapping("/")
+-     public String hello() {
+--        UserDO userDO = userDOMapper.selectByPrimaryKey(1);
+-+        /*UserDO userDO = userDOMapper.selectByPrimaryKey(1);
+-         if(userDO == null) {
+-             return "用户不存在.";
+-         }
+-         else {
+-             return userDO.getName();
+--        }
+-+        }*/
+-+        return "Hello World!";
+-     }
+- 
+-     public static void main(String[] args) {
+-Index: BackEnd/src/main/resources/application.properties
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>server.port=8090\r\nmybatis.mapperLocations=classpath:mapping/*.xml\r\n\r\nspring.datasource.name=pkuEater\r\nspring.datasource.url=jdbc:mysql://47.94.139.212:3306/pkuEater?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false\r\nspring.datasource.username=root\r\nspring.datasource.password=pku123456\r\n\r\nspring.datasource.type=com.alibaba.druid.pool.DruidDataSource\r\nspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>ISO-8859-1
+-===================================================================
+-diff --git a/BackEnd/src/main/resources/application.properties b/BackEnd/src/main/resources/application.properties
+---- a/BackEnd/src/main/resources/application.properties	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/src/main/resources/application.properties	(date 1665385883915)
+-@@ -1,4 +1,4 @@
+--server.port=8090
+-+server.port=8080
+- mybatis.mapperLocations=classpath:mapping/*.xml
+- 
+- spring.datasource.name=pkuEater
+-Index: BackEnd/src/main/java/org/example/controller/UserController.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package org.example.controller;\r\n\r\nimport org.example.controller.viewobject.UserVO;\r\nimport org.example.error.BusinessException;\r\nimport org.example.error.EmBusinessError;\r\nimport org.example.response.CommonReturnType;\r\nimport org.example.service.model.UserModel;\r\nimport org.springframework.beans.BeanUtils;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.http.HttpStatus;\r\nimport org.springframework.stereotype.Controller;\r\nimport org.springframework.web.bind.annotation.*;\r\nimport org.example.service.UserService;\r\nimport org.springframework.web.client.HttpServerErrorException;\r\n\r\nimport javax.servlet.http.HttpServletRequest;\r\nimport javax.servlet.http.HttpSession;\r\nimport java.io.UnsupportedEncodingException;\r\nimport java.security.MessageDigest;\r\nimport java.security.NoSuchAlgorithmException;\r\nimport java.util.HashMap;\r\nimport java.util.Map;\r\n\r\n//如果不加ResponseBody的话\r\n//就要用RestController\r\n@Controller(\"user\")\r\n@RequestMapping(\"/user\")\r\n//@CrossOrigin(allowCredentials = \"true\", allowedHeaders = \"*\")\r\npublic class UserController extends BaseController {\r\n\r\n    @Autowired\r\n    private UserService userService;\r\n\r\n    @Autowired\r\n    private HttpServletRequest httpServletRequest;\r\n\r\n    private HttpSession session;\r\n\r\n    @RequestMapping(\"/get\")\r\n    @ResponseBody\r\n    public CommonReturnType getUser(@RequestParam(name=\"id\")Integer id) throws BusinessException {\r\n        //调用service服务获取对应id的用户对象并返回给前端\r\n       UserModel userModel = userService.getUserById(id);\r\n\r\n       //若获取的对应用户信息不存在\r\n        if(userModel == null){\r\n\r\n            throw new BusinessException(EmBusinessError.USER_NOT_EXIST);\r\n        }\r\n\r\n       //将核心领域模型用户对象转化为可供UI使用的viewobject\r\n       UserVO userVO =  convertFromModel(userModel);\r\n\r\n       //返回通用对象\r\n       return CommonReturnType.create(userVO);\r\n    }\r\n\r\n    private UserVO convertFromModel(UserModel userModel){\r\n        if(userModel == null){\r\n            return null;\r\n        }\r\n        UserVO userVO = new UserVO();\r\n        BeanUtils.copyProperties(userModel, userVO);\r\n        return userVO;\r\n    }\r\n\r\n\r\n    //定义exceptionhandler解决未被controller层吸收的exception\r\n    @ExceptionHandler(Exception.class)\r\n    @ResponseStatus(HttpStatus.OK)\r\n    @ResponseBody\r\n    public Object handlerException(HttpServletRequest request, Exception ex){\r\n        Map<String,Object> responseData = new HashMap<>();\r\n        if(ex instanceof BusinessException){\r\n            BusinessException businessException = (BusinessException)ex;\r\n            responseData.put(\"errCode\",businessException.getErrCode());\r\n            responseData.put(\"errMsg\",businessException.getErrMsg());\r\n        }else{\r\n            responseData.put(\"errCode\",EmBusinessError.UNKNOWN_ERROR.getErrCode());\r\n            responseData.put(\"errMsg\",EmBusinessError.UNKNOWN_ERROR.getErrMsg());\r\n        }\r\n        return CommonReturnType.create(responseData,\"fail\");\r\n    }\r\n\r\n    /**\r\n     * 用户注册接口\r\n     * 接收参数统一使用字符串，接收后再进行类型转换\r\n     *\r\n     * @param name      姓名\r\n     * @param age    年龄\r\n     * @param gender 性别\r\n     * @param password  密码\r\n     * @return 通用返回对象\r\n     */\r\n    //定义请求的方式（POST而不是GET），以及表单上传编码格式（application/x-www-form-urlencoded）\r\n    @RequestMapping(value = \"/register\", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})\r\n    @ResponseBody\r\n    public CommonReturnType register(@RequestParam(name=\"name\")String name,\r\n                                     @RequestParam(name=\"gender\")Integer gender,\r\n                                     @RequestParam(name=\"age\")Integer age,\r\n                                     @RequestParam(name=\"password\")String password\r\n    ) throws BusinessException{\r\n        UserModel userModel = new UserModel();\r\n        userModel.setName(name);\r\n        userModel.setGender(gender);\r\n        userModel.setAge(age);\r\n        //密码按道理是需要加密的，目前暂不加密\r\n        //userModel.setEncrptPassword(MD5Encoder.encode(password.getBytes()));\r\n        userModel.setEncrptPassword(password);\r\n\r\n        userService.register(userModel);\r\n\r\n        return CommonReturnType.create(null);\r\n    }\r\n\r\n    //用户登录接口\r\n    /**\r\n     * 用户登录接口\r\n     * 接收参数统一使用字符串，接收后再进行类型转换\r\n     *\r\n     * @param name      姓名\r\n     * @param password  密码\r\n     * @return 通用返回对象\r\n     */\r\n    @RequestMapping(value = \"/login\", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})\r\n    @ResponseBody\r\n    public CommonReturnType login(@RequestParam(name=\"name\")String name,\r\n                                  @RequestParam(name=\"password\")String password)\r\n            throws BusinessException{\r\n        // 入参校验\r\n        if (org.apache.commons.lang3.StringUtils.isEmpty(name)\r\n                || org.apache.commons.lang3.StringUtils.isEmpty(password)\r\n        ) {\r\n            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);\r\n        }\r\n\r\n        // 用户登录服务，校验登录是否合法\r\n        UserModel userModel = userService.validateLogin(name, password);\r\n\r\n        // 将登录凭证加入到用户登录成功的session内\r\n        // 切换web页面的时候，可以不用重复登录\r\n        session = httpServletRequest.getSession();\r\n        session.setAttribute(\"IS_LOGIN\", true);\r\n        session.setAttribute(\"LOGIN_USER\", userModel);\r\n\r\n        // 登录成功，只返回success即可\r\n        return CommonReturnType.create(null);\r\n    }\r\n}\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/BackEnd/src/main/java/org/example/controller/UserController.java b/BackEnd/src/main/java/org/example/controller/UserController.java
+---- a/BackEnd/src/main/java/org/example/controller/UserController.java	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/src/main/java/org/example/controller/UserController.java	(date 1665385978777)
+-@@ -87,8 +87,8 @@
+-      * 接收参数统一使用字符串，接收后再进行类型转换
+-      *
+-      * @param name      姓名
+--     * @param age    年龄
+--     * @param gender 性别
+-+     * @param ageStr    年龄
+-+     * @param genderStr 性别
+-      * @param password  密码
+-      * @return 通用返回对象
+-      */
+-@@ -96,11 +96,13 @@
+-     @RequestMapping(value = "/register", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+-     @ResponseBody
+-     public CommonReturnType register(@RequestParam(name="name")String name,
+--                                     @RequestParam(name="gender")Integer gender,
+--                                     @RequestParam(name="age")Integer age,
+-+                                     @RequestParam(name="gender")String ageStr,
+-+                                     @RequestParam(name="age")String genderStr,
+-                                      @RequestParam(name="password")String password
+-     ) throws BusinessException{
+-         UserModel userModel = new UserModel();
+-+        int age = Integer.parseInt(ageStr);
+-+        int gender = Integer.parseInt(genderStr);
+-         userModel.setName(name);
+-         userModel.setGender(gender);
+-         userModel.setAge(age);
+-Index: .idea/shelf/_2022_10_2_15_10____.xml
+-===================================================================
+-diff --git a/.idea/shelf/_2022_10_2_15_10____.xml b/.idea/shelf/_2022_10_2_15_10____.xml
+-deleted file mode 100644
+---- a/.idea/shelf/_2022_10_2_15_10____.xml	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ /dev/null	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-@@ -1,4 +0,0 @@
+--<changelist name="在进行更新之前于_2022_10_2_15_10_取消提交了变更_[变更]" date="1664694650965" recycled="true" deleted="true">
+--  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_2_15_10_取消提交了变更_[变更]/shelved.patch" />
+--  <option name="DESCRIPTION" value="在进行更新之前于 2022/10/2 15:10 取消提交了变更 [变更]" />
+--</changelist>
+-\ No newline at end of file
+-Index: .idea/shelf/在进行更新之前于_2022_10_2_19_08_取消提交了变更_[变更]/shelved.patch
+-===================================================================
+-diff --git a/.idea/shelf/在进行更新之前于_2022_10_2_19_08_取消提交了变更_[变更]/shelved.patch b/.idea/shelf/在进行更新之前于_2022_10_2_19_08_取消提交了变更_[变更]/shelved.patch
+-deleted file mode 100644
+---- a/.idea/shelf/在进行更新之前于_2022_10_2_19_08_取消提交了变更_[变更]/shelved.patch	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ /dev/null	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-@@ -1,76 +0,0 @@
+--Index: BackEnd/src/main/java/org/example/controller/UserController.java
+--IDEA additional info:
+--Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+--<+>package org.example.controller;\r\n\r\nimport org.example.controller.viewobject.UserVO;\r\nimport org.example.service.model.UserModel;\r\nimport org.springframework.beans.BeanUtils;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.stereotype.Controller;\r\nimport org.springframework.web.bind.annotation.RequestMapping;\r\nimport org.springframework.web.bind.annotation.RequestParam;\r\nimport org.example.service.UserService;\r\nimport org.springframework.web.bind.annotation.ResponseBody;\r\n\r\n//如果不加ResponseBody的话\r\n//就要用RestController\r\n@Controller(\"user\")\r\n@RequestMapping(\"/user\")\r\npublic class UserController {\r\n\r\n    @Autowired\r\n    private UserService userService;\r\n    @RequestMapping(\"/get\")\r\n    @ResponseBody\r\n    public UserVO getUser(@RequestParam(name=\"id\")Integer id){\r\n        //调用service服务获取对应id的用户对象并返回给前端\r\n       UserModel userModel = userService.getUserById(id);\r\n\r\n       //将核心领域模型用户对象转化为可供UI使用的viewobject\r\n       return convertFromModel(userModel);\r\n    }\r\n\r\n    private UserVO convertFromModel(UserModel userModel){\r\n        if(userModel == null){\r\n            return null;\r\n        }\r\n        UserVO userVO = new UserVO();\r\n        BeanUtils.copyProperties(userModel, userVO);\r\n        return userVO;\r\n    }\r\n}\r\n
+--Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+--<+>UTF-8
+--===================================================================
+--diff --git a/BackEnd/src/main/java/org/example/controller/UserController.java b/BackEnd/src/main/java/org/example/controller/UserController.java
+----- a/BackEnd/src/main/java/org/example/controller/UserController.java	(revision 1296af4b3bdff9aed9df738d4ea8d8785a50e548)
+--+++ b/BackEnd/src/main/java/org/example/controller/UserController.java	(date 1664698461793)
+--@@ -36,4 +36,6 @@
+--         BeanUtils.copyProperties(userModel, userVO);
+--         return userVO;
+--     }
+--+
+--+    //用户注册接口
+-- }
+--Index: .idea/workspace.xml
+--IDEA additional info:
+--Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+--<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"NONE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"72dae969-5783-4578-9b4a-3cefce4e8bd5\" name=\"变更\" comment=\"成功连接上数据库服务器\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/misc.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/misc.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/shelf/_2022_10_2_14_42____.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/shelf/_2022_10_2_14_42____.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/UserVO.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/UserVO.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/target/classes/mapping/PasswordDOMapper.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/target/classes/mapping/PasswordDOMapper.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/UserVO.class\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/UserVO.class\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/service/model/UserModel.class\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/service/model/UserModel.class\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/README.md\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/README.md\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"CodeStyleSettingsInfer\">\r\n    <option name=\"done\" value=\"true\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Interface\" />\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"PUSH_TAGS\">\r\n      <GitPushTagMode>\r\n        <option name=\"argument\" value=\"--follow-tags\" />\r\n        <option name=\"title\" value=\"Current Branch\" />\r\n      </GitPushTagMode>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"useMavenConfig\" value=\"true\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProblemsViewState\">\r\n    <option name=\"selectedTabId\" value=\"CurrentFile\" />\r\n  </component>\r\n  <component name=\"ProjectCodeStyleSettingsMigration\">\r\n    <option name=\"version\" value=\"2\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2FDfFMJt7PKnLyoX2O4JyNnBqjA\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\n  &quot;keyToString&quot;: {\n    &quot;last_opened_file_path&quot;: &quot;D:/大三上/软件工程/龙虾电商/PromoProject-master&quot;,\n    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;\n  }\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CreateClassDialog.RecentsKey\">\r\n      <recent name=\"service.impl\" />\r\n    </key>\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\java\" />\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\resources\\xml\" />\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\res\" />\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\.idea\" />\r\n    </key>\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\resources\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"应用程序.App\">\r\n    <configuration name=\"App\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.example.App\" />\r\n      <module name=\"BackEnd\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"org.example.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration name=\"mybatis-generator\" type=\"MavenRunConfiguration\" factoryName=\"Maven\">\r\n      <MavenSettings>\r\n        <option name=\"myGeneralSettings\" />\r\n        <option name=\"myRunnerSettings\" />\r\n        <option name=\"myRunnerParameters\">\r\n          <MavenRunnerParameters>\r\n            <option name=\"profiles\">\r\n              <set />\r\n            </option>\r\n            <option name=\"goals\">\r\n              <list>\r\n                <option value=\"mybatis-generator:generate\" />\r\n              </list>\r\n            </option>\r\n            <option name=\"pomFileName\" />\r\n            <option name=\"profilesMap\">\r\n              <map />\r\n            </option>\r\n            <option name=\"resolveToWorkspace\" value=\"false\" />\r\n            <option name=\"workingDirPath\" value=\"$PROJECT_DIR$/BackEnd\" />\r\n          </MavenRunnerParameters>\r\n        </option>\r\n      </MavenSettings>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <list>\r\n      <item itemvalue=\"Maven.mybatis-generator\" />\r\n      <item itemvalue=\"应用程序.App\" />\r\n    </list>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"应用程序.App\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"应用程序级\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"默认任务\">\r\n      <changelist id=\"72dae969-5783-4578-9b4a-3cefce4e8bd5\" name=\"变更\" comment=\"\" />\r\n      <created>1664031470652</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1664031470652</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"使用mybatis将本地数据库连接进去了，要改成远程数据库可能需要开放防火墙，之后弄\">\r\n      <created>1664098640925</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664098640925</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"成功连接上数据库服务器\">\r\n      <created>1664115561415</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664115561415</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"成功连接上数据库服务器\">\r\n      <created>1664692245879</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664692245879</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"4\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"使用mybatis将本地数据库连接进去了，要改成远程数据库可能需要开放防火墙，之后弄\" />\r\n    <MESSAGE value=\"成功连接上数据库服务器\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"成功连接上数据库服务器\" />\r\n  </component>\r\n</project>
+--Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+--<+>UTF-8
+--===================================================================
+--diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+----- a/.idea/workspace.xml	(revision 1296af4b3bdff9aed9df738d4ea8d8785a50e548)
+--+++ b/.idea/workspace.xml	(date 1664698461997)
+--@@ -4,21 +4,9 @@
+--     <option name="autoReloadType" value="NONE" />
+--   </component>
+--   <component name="ChangeListManager">
+---    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="成功连接上数据库服务器">
+---      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_14_42____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_14_42____.xml" afterDir="false" />
+--+    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="修正一些小BUG">
+--       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+--       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/UserVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/UserVO.java" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mapping/PasswordDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mapping/PasswordDOMapper.xml" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/UserVO.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/UserVO.class" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/model/UserModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/model/UserModel.class" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+--     </list>
+--     <option name="SHOW_DIALOG" value="false" />
+--     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+--@@ -165,7 +153,14 @@
+--       <option name="project" value="LOCAL" />
+--       <updated>1664692245879</updated>
+--     </task>
+---    <option name="localTasksCounter" value="4" />
+--+    <task id="LOCAL-00004" summary="修正一些小BUG">
+--+      <created>1664694556638</created>
+--+      <option name="number" value="00004" />
+--+      <option name="presentableId" value="LOCAL-00004" />
+--+      <option name="project" value="LOCAL" />
+--+      <updated>1664694556639</updated>
+--+    </task>
+--+    <option name="localTasksCounter" value="5" />
+--     <servers />
+--   </component>
+--   <component name="Vcs.Log.Tabs.Properties">
+--@@ -182,6 +177,7 @@
+--   <component name="VcsManagerConfiguration">
+--     <MESSAGE value="使用mybatis将本地数据库连接进去了，要改成远程数据库可能需要开放防火墙，之后弄" />
+--     <MESSAGE value="成功连接上数据库服务器" />
+---    <option name="LAST_COMMIT_MESSAGE" value="成功连接上数据库服务器" />
+--+    <MESSAGE value="修正一些小BUG" />
+--+    <option name="LAST_COMMIT_MESSAGE" value="修正一些小BUG" />
+--   </component>
+-- </project>
+--\ No newline at end of file
+-Index: .idea/shelf/在进行更新之前于_2022_10_2_15_10_取消提交了变更_[变更]/shelved.patch
+-===================================================================
+-diff --git a/.idea/shelf/在进行更新之前于_2022_10_2_15_10_取消提交了变更_[变更]/shelved.patch b/.idea/shelf/在进行更新之前于_2022_10_2_15_10_取消提交了变更_[变更]/shelved.patch
+-deleted file mode 100644
+---- a/.idea/shelf/在进行更新之前于_2022_10_2_15_10_取消提交了变更_[变更]/shelved.patch	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ /dev/null	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-@@ -1,36 +0,0 @@
+--Index: .idea/workspace.xml
+--IDEA additional info:
+--Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+--<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"NONE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"72dae969-5783-4578-9b4a-3cefce4e8bd5\" name=\"变更\" comment=\"成功连接上数据库服务器\">\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"CodeStyleSettingsInfer\">\r\n    <option name=\"done\" value=\"true\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Interface\" />\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"PUSH_TAGS\">\r\n      <GitPushTagMode>\r\n        <option name=\"argument\" value=\"--follow-tags\" />\r\n        <option name=\"title\" value=\"Current Branch\" />\r\n      </GitPushTagMode>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"useMavenConfig\" value=\"true\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProblemsViewState\">\r\n    <option name=\"selectedTabId\" value=\"CurrentFile\" />\r\n  </component>\r\n  <component name=\"ProjectCodeStyleSettingsMigration\">\r\n    <option name=\"version\" value=\"2\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2FDfFMJt7PKnLyoX2O4JyNnBqjA\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\n  &quot;keyToString&quot;: {\n    &quot;last_opened_file_path&quot;: &quot;D:/大三上/软件工程/龙虾电商/PromoProject-master&quot;,\n    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;\n  }\n}</component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CreateClassDialog.RecentsKey\">\r\n      <recent name=\"service.impl\" />\r\n    </key>\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\java\" />\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\resources\\xml\" />\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\res\" />\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\.idea\" />\r\n    </key>\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\resources\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"应用程序.App\">\r\n    <configuration name=\"App\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.example.App\" />\r\n      <module name=\"BackEnd\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"org.example.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration name=\"mybatis-generator\" type=\"MavenRunConfiguration\" factoryName=\"Maven\">\r\n      <MavenSettings>\r\n        <option name=\"myGeneralSettings\" />\r\n        <option name=\"myRunnerSettings\" />\r\n        <option name=\"myRunnerParameters\">\r\n          <MavenRunnerParameters>\r\n            <option name=\"profiles\">\r\n              <set />\r\n            </option>\r\n            <option name=\"goals\">\r\n              <list>\r\n                <option value=\"mybatis-generator:generate\" />\r\n              </list>\r\n            </option>\r\n            <option name=\"pomFileName\" />\r\n            <option name=\"profilesMap\">\r\n              <map />\r\n            </option>\r\n            <option name=\"resolveToWorkspace\" value=\"false\" />\r\n            <option name=\"workingDirPath\" value=\"$PROJECT_DIR$/BackEnd\" />\r\n          </MavenRunnerParameters>\r\n        </option>\r\n      </MavenSettings>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <list>\r\n      <item itemvalue=\"Maven.mybatis-generator\" />\r\n      <item itemvalue=\"应用程序.App\" />\r\n    </list>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"应用程序.App\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"应用程序级\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"默认任务\">\r\n      <changelist id=\"72dae969-5783-4578-9b4a-3cefce4e8bd5\" name=\"变更\" comment=\"\" />\r\n      <created>1664031470652</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1664031470652</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"使用mybatis将本地数据库连接进去了，要改成远程数据库可能需要开放防火墙，之后弄\">\r\n      <created>1664098640925</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664098640925</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"成功连接上数据库服务器\">\r\n      <created>1664115561415</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664115561415</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"成功连接上数据库服务器\">\r\n      <created>1664692245879</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664692245879</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"4\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"使用mybatis将本地数据库连接进去了，要改成远程数据库可能需要开放防火墙，之后弄\" />\r\n    <MESSAGE value=\"成功连接上数据库服务器\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"成功连接上数据库服务器\" />\r\n  </component>\r\n</project>
+--Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+--<+>UTF-8
+--===================================================================
+--diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+----- a/.idea/workspace.xml	(revision 41c5e2dff8a92cbc8f1f5b17e96f432ab79ad0b9)
+--+++ b/.idea/workspace.xml	(date 1664694025274)
+--@@ -5,8 +5,7 @@
+--   </component>
+--   <component name="ChangeListManager">
+--     <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="成功连接上数据库服务器">
+---      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class" afterDir="false" />
+--+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+--     </list>
+--     <option name="SHOW_DIALOG" value="false" />
+--     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+--@@ -153,7 +152,14 @@
+--       <option name="project" value="LOCAL" />
+--       <updated>1664692245879</updated>
+--     </task>
+---    <option name="localTasksCounter" value="4" />
+--+    <task id="LOCAL-00004" summary="成功连接上数据库服务器">
+--+      <created>1664693218276</created>
+--+      <option name="number" value="00004" />
+--+      <option name="presentableId" value="LOCAL-00004" />
+--+      <option name="project" value="LOCAL" />
+--+      <updated>1664693218276</updated>
+--+    </task>
+--+    <option name="localTasksCounter" value="5" />
+--     <servers />
+--   </component>
+--   <component name="Vcs.Log.Tabs.Properties">
+-Index: .idea/libraries/Maven__org_slf4j_slf4j_reload4j_2_0_1.xml
+-===================================================================
+-diff --git a/.idea/libraries/Maven__org_slf4j_slf4j_reload4j_2_0_1.xml b/.idea/libraries/Maven__org_slf4j_slf4j_reload4j_2_0_1.xml
+-deleted file mode 100644
+---- a/.idea/libraries/Maven__org_slf4j_slf4j_reload4j_2_0_1.xml	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ /dev/null	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-@@ -1,13 +0,0 @@
+--<component name="libraryTable">
+--  <library name="Maven: org.slf4j:slf4j-reload4j:2.0.1">
+--    <CLASSES>
+--      <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-reload4j/2.0.1/slf4j-reload4j-2.0.1.jar!/" />
+--    </CLASSES>
+--    <JAVADOC>
+--      <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-reload4j/2.0.1/slf4j-reload4j-2.0.1-javadoc.jar!/" />
+--    </JAVADOC>
+--    <SOURCES>
+--      <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-reload4j/2.0.1/slf4j-reload4j-2.0.1-sources.jar!/" />
+--    </SOURCES>
+--  </library>
+--</component>
+-\ No newline at end of file
+-Index: .idea/shelf/_2022_10_2_14_49____.xml
+-===================================================================
+-diff --git a/.idea/shelf/_2022_10_2_14_49____.xml b/.idea/shelf/_2022_10_2_14_49____.xml
+-deleted file mode 100644
+---- a/.idea/shelf/_2022_10_2_14_49____.xml	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ /dev/null	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-@@ -1,9 +0,0 @@
+--<changelist name="在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]" date="1664693382552" recycled="true" deleted="true">
+--  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]/shelved.patch" />
+--  <option name="DESCRIPTION" value="在进行更新之前于 2022/10/2 14:49 取消提交了变更 [变更]" />
+--  <binary>
+--    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/controller/UserController.class" />
+--    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/controller/UserController.class" />
+--    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]/UserController.class" />
+--  </binary>
+--</changelist>
+-\ No newline at end of file
+-Index: .idea/shelf/_2022_10_2_19_08____.xml
+-===================================================================
+-diff --git a/.idea/shelf/_2022_10_2_19_08____.xml b/.idea/shelf/_2022_10_2_19_08____.xml
+-deleted file mode 100644
+---- a/.idea/shelf/_2022_10_2_19_08____.xml	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ /dev/null	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-@@ -1,4 +0,0 @@
+--<changelist name="在进行更新之前于_2022_10_2_19_08_取消提交了变更_[变更]" date="1664709012056" recycled="true" deleted="true">
+--  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_2_19_08_取消提交了变更_[变更]/shelved.patch" />
+--  <option name="DESCRIPTION" value="在进行更新之前于 2022/10/2 19:08 取消提交了变更 [变更]" />
+--</changelist>
+-\ No newline at end of file
+-Index: .idea/shelf/在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]/shelved.patch
+-===================================================================
+-diff --git a/.idea/shelf/在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]/shelved.patch b/.idea/shelf/在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]/shelved.patch
+-deleted file mode 100644
+---- a/.idea/shelf/在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]/shelved.patch	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ /dev/null	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-@@ -1,145 +0,0 @@
+--Index: BackEnd/src/main/java/org/example/controller/UserController.java
+--IDEA additional info:
+--Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+--<+>package org.example.controller;\r\n\r\nimport org.example.dataobject.UserDO;\r\nimport org.example.service.UserService;\r\nimport org.example.service.model.UserModel;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.stereotype.Controller;\r\nimport org.springframework.web.bind.annotation.RequestMapping;\r\nimport org.springframework.web.bind.annotation.RequestParam;\r\nimport org.springframework.web.bind.annotation.ResponseBody;\r\n\r\n@Controller(\"user\")\r\n@RequestMapping(\"/user\")\r\npublic class UserController {\r\n    @Autowired\r\n    private UserService userService;\r\n\r\n    //调用service服务获取对应id的用户对象并返回给前端\r\n    //输入localhost:8090/user/get?\r\n    //记得加了ResponseBody才能在前端显示，类注解RestBody也可以……\r\n    @RequestMapping(\"/get\")\r\n    @ResponseBody\r\n    public UserModel getUser(@RequestParam(name = \"id\") Integer id) {\r\n        UserModel userModel = userService.getUserById(id);\r\n        return userModel;\r\n    }\r\n}\r\n
+--Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+--<+>UTF-8
+--===================================================================
+--diff --git a/BackEnd/src/main/java/org/example/controller/UserController.java b/BackEnd/src/main/java/org/example/controller/UserController.java
+----- a/BackEnd/src/main/java/org/example/controller/UserController.java	(revision efcdf23ad80ecea8289efc4eb788d061e62d0fd3)
+--+++ b/BackEnd/src/main/java/org/example/controller/UserController.java	(date 1664692967132)
+--@@ -1,8 +1,10 @@
+-- package org.example.controller;
+-- 
+--+import org.example.controller.viewobject.UserVO;
+-- import org.example.dataobject.UserDO;
+-- import org.example.service.UserService;
+-- import org.example.service.model.UserModel;
+--+import org.springframework.beans.BeanUtils;
+-- import org.springframework.beans.factory.annotation.Autowired;
+-- import org.springframework.stereotype.Controller;
+-- import org.springframework.web.bind.annotation.RequestMapping;
+--@@ -20,8 +22,17 @@
+--     //记得加了ResponseBody才能在前端显示，类注解RestBody也可以……
+--     @RequestMapping("/get")
+--     @ResponseBody
+---    public UserModel getUser(@RequestParam(name = "id") Integer id) {
+--+    public UserVO getUser(@RequestParam(name = "id") Integer id) {
+--         UserModel userModel = userService.getUserById(id);
+---        return userModel;
+--+        //UserModel是后端用的，有些信息往前端传输是不安全的
+--+        //所以我们使用了UserVO类来解决
+--+        return convertFromModel(userModel);
+--+    }
+--+
+--+    private UserVO convertFromModel(UserModel userModel) {
+--+        if(userModel == null) return null;
+--+        UserVO userVO = new UserVO();
+--+        BeanUtils.copyProperties(userModel, userVO);
+--+        return userVO;
+--     }
+-- }
+--Index: BackEnd/src/main/java/org/example/controller/viewobject/UserVO.java
+--IDEA additional info:
+--Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+--<+>UTF-8
+--===================================================================
+--diff --git a/BackEnd/src/main/java/org/example/controller/viewobject/UserVO.java b/BackEnd/src/main/java/org/example/controller/viewobject/UserVO.java
+--new file mode 100644
+----- /dev/null	(date 1664692841600)
+--+++ b/BackEnd/src/main/java/org/example/controller/viewobject/UserVO.java	(date 1664692841600)
+--@@ -0,0 +1,40 @@
+--+package org.example.controller.viewobject;
+--+
+--+public class UserVO {
+--+    private Integer id;
+--+    private String name;
+--+    private Integer gender;
+--+    private Integer age;
+--+
+--+    public Integer getId() {
+--+        return id;
+--+    }
+--+
+--+    public void setId(Integer id) {
+--+        this.id = id;
+--+    }
+--+
+--+    public String getName() {
+--+        return name;
+--+    }
+--+
+--+    public void setName(String name) {
+--+        this.name = name;
+--+    }
+--+
+--+    public Integer getGender() {
+--+        return gender;
+--+    }
+--+
+--+    public void setGender(Integer gender) {
+--+        this.gender = gender;
+--+    }
+--+
+--+    public Integer getAge() {
+--+        return age;
+--+    }
+--+
+--+    public void setAge(Integer age) {
+--+        this.age = age;
+--+    }
+--+}
+--Index: README.md
+--IDEA additional info:
+--Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+--<+># software_class\r\n\r\n# BackEnd\r\n\r\n后端框架（服务器）\r\n\r\n基于**Maven+Mybatis+SpringBoot**\r\n\r\n使用IDEA打开，点击右侧栏Maven和刷新按钮下载相关依赖， 使用mybatis-generator可以生成数据库对应的dataObject类以及Mapper。\r\n\r\n直接运行App，在网页localhost:8090可以得到Hello World\r\n\r\n使用localhost:8090/user/get?id=1可以获得用户信息json，其中id=后面接对应的用户id。
+--Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+--<+>UTF-8
+--===================================================================
+--diff --git a/README.md b/README.md
+----- a/README.md	(revision efcdf23ad80ecea8289efc4eb788d061e62d0fd3)
+--+++ b/README.md	(date 1664692386035)
+--@@ -6,8 +6,10 @@
+-- 
+-- 基于**Maven+Mybatis+SpringBoot**
+-- 
+---使用IDEA打开，点击右侧栏Maven和刷新按钮下载相关依赖， 使用mybatis-generator可以生成数据库对应的dataObject类以及Mapper。
+--+使用IDEA打开，点击右侧栏Maven和刷新按钮下载相关依赖
+-- 
+---直接运行App，在网页localhost:8090可以得到Hello World
+--+构建/运行选项选择mybatis-generator可以生成数据库对应的dataObject类以及Mapper。
+--+
+--+选择App则直接运行，在地址localhost:8090可以得到Hello World
+-- 
+---使用localhost:8090/user/get?id=1可以获得用户信息json，其中id=后面接对应的用户id。
+--\ No newline at end of file
+--+地址localhost:8090/user/get?id=1可以获得用户信息json，其中id=后面接对应的用户id。
+--\ No newline at end of file
+--Index: .idea/workspace.xml
+--IDEA additional info:
+--Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+--<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"72dae969-5783-4578-9b4a-3cefce4e8bd5\" name=\"变更\" comment=\"成功连接上数据库服务器\">\r\n      <change afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/UserService.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java\" afterDir=\"false\" />\r\n      <change afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/resources/application.properties\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/resources/application.properties\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/README.md\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/README.md\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"CodeStyleSettingsInfer\">\r\n    <option name=\"done\" value=\"true\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Interface\" />\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"useMavenConfig\" value=\"true\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProjectCodeStyleSettingsMigration\">\r\n    <option name=\"version\" value=\"2\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2FDfFMJt7PKnLyoX2O4JyNnBqjA\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\">{\n  &quot;keyToString&quot;: {\n    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,\n    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,\n    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,\n    &quot;last_opened_file_path&quot;: &quot;D:/big_homework/android/LoginDemo-master&quot;,\n    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;\n  }\n}</component>\r\n  <component name=\"RunManager\" selected=\"应用程序.App\">\r\n    <configuration name=\"App\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.example.App\" />\r\n      <module name=\"BackEnd\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"org.example.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration name=\"mybatis-generator\" type=\"MavenRunConfiguration\" factoryName=\"Maven\">\r\n      <MavenSettings>\r\n        <option name=\"myGeneralSettings\" />\r\n        <option name=\"myRunnerSettings\" />\r\n        <option name=\"myRunnerParameters\">\r\n          <MavenRunnerParameters>\r\n            <option name=\"profiles\">\r\n              <set />\r\n            </option>\r\n            <option name=\"goals\">\r\n              <list>\r\n                <option value=\"mybatis-generator:generate\" />\r\n              </list>\r\n            </option>\r\n            <option name=\"pomFileName\" />\r\n            <option name=\"profilesMap\">\r\n              <map />\r\n            </option>\r\n            <option name=\"resolveToWorkspace\" value=\"false\" />\r\n            <option name=\"workingDirPath\" value=\"$PROJECT_DIR$/BackEnd\" />\r\n          </MavenRunnerParameters>\r\n        </option>\r\n      </MavenSettings>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <list>\r\n      <item itemvalue=\"Maven.mybatis-generator\" />\r\n      <item itemvalue=\"应用程序.App\" />\r\n    </list>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"应用程序.App\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"应用程序级\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"默认任务\">\r\n      <changelist id=\"72dae969-5783-4578-9b4a-3cefce4e8bd5\" name=\"变更\" comment=\"\" />\r\n      <created>1664031470652</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1664031470652</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"使用mybatis将本地数据库连接进去了，要改成远程数据库可能需要开放防火墙，之后弄\">\r\n      <created>1664098640925</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664098640925</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"成功连接上数据库服务器\">\r\n      <created>1664115561415</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664115561415</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"3\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"使用mybatis将本地数据库连接进去了，要改成远程数据库可能需要开放防火墙，之后弄\" />\r\n    <MESSAGE value=\"成功连接上数据库服务器\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"成功连接上数据库服务器\" />\r\n  </component>\r\n</project>
+--Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+--<+>UTF-8
+--===================================================================
+--diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+----- a/.idea/workspace.xml	(revision efcdf23ad80ecea8289efc4eb788d061e62d0fd3)
+--+++ b/.idea/workspace.xml	(date 1664692905288)
+--@@ -5,14 +5,10 @@
+--   </component>
+--   <component name="ChangeListManager">
+--     <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="成功连接上数据库服务器">
+---      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" afterDir="false" />
+---      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/UserService.java" afterDir="false" />
+---      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java" afterDir="false" />
+---      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java" afterDir="false" />
+--+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/UserVO.java" afterDir="false" />
+--       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/application.properties" afterDir="false" />
+---      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml" afterDir="false" />
+--+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" afterDir="false" />
+--+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" afterDir="false" />
+--       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+--     </list>
+--     <option name="SHOW_DIALOG" value="false" />
+-Index: BackEnd/target/classes/mapping/UserDOMapper.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\r\n<mapper namespace=\"org.example.dao.UserDOMapper\">\r\n  <resultMap id=\"BaseResultMap\" type=\"org.example.dataobject.UserDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    <id column=\"id\" jdbcType=\"INTEGER\" property=\"id\" />\r\n    <result column=\"name\" jdbcType=\"VARCHAR\" property=\"name\" />\r\n    <result column=\"gender\" jdbcType=\"INTEGER\" property=\"gender\" />\r\n    <result column=\"age\" jdbcType=\"INTEGER\" property=\"age\" />\r\n  </resultMap>\r\n  <sql id=\"Base_Column_List\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    id, name, gender, age\r\n  </sql>\r\n  <select id=\"selectByPrimaryKey\" parameterType=\"java.lang.Integer\" resultMap=\"BaseResultMap\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    select \r\n    <include refid=\"Base_Column_List\" />\r\n    from user_info\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </select>\r\n  <delete id=\"deleteByPrimaryKey\" parameterType=\"java.lang.Integer\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    delete from user_info\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </delete>\r\n  <!--根据Name来查找表项-->\r\n  <select id=\"selectByUserName\" resultMap=\"BaseResultMap\">\r\n    select\r\n    <include refid=\"Base_Column_List\" />\r\n    from user_info\r\n    where name = #{name,jdbcType=VARCHAR}\r\n  </select>\r\n  <insert id=\"insert\" parameterType=\"org.example.dataobject.UserDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    insert into user_info (id, name, gender, \r\n      age)\r\n    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER}, \r\n      #{age,jdbcType=INTEGER})\r\n  </insert>\r\n  <insert id=\"insertSelective\" parameterType=\"org.example.dataobject.UserDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    insert into user_info\r\n    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\r\n      <if test=\"id != null\">\r\n        id,\r\n      </if>\r\n      <if test=\"name != null\">\r\n        name,\r\n      </if>\r\n      <if test=\"gender != null\">\r\n        gender,\r\n      </if>\r\n      <if test=\"age != null\">\r\n        age,\r\n      </if>\r\n    </trim>\r\n    <trim prefix=\"values (\" suffix=\")\" suffixOverrides=\",\">\r\n      <if test=\"id != null\">\r\n        #{id,jdbcType=INTEGER},\r\n      </if>\r\n      <if test=\"name != null\">\r\n        #{name,jdbcType=VARCHAR},\r\n      </if>\r\n      <if test=\"gender != null\">\r\n        #{gender,jdbcType=INTEGER},\r\n      </if>\r\n      <if test=\"age != null\">\r\n        #{age,jdbcType=INTEGER},\r\n      </if>\r\n    </trim>\r\n  </insert>\r\n  <update id=\"updateByPrimaryKeySelective\" parameterType=\"org.example.dataobject.UserDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    update user_info\r\n    <set>\r\n      <if test=\"name != null\">\r\n        name = #{name,jdbcType=VARCHAR},\r\n      </if>\r\n      <if test=\"gender != null\">\r\n        gender = #{gender,jdbcType=INTEGER},\r\n      </if>\r\n      <if test=\"age != null\">\r\n        age = #{age,jdbcType=INTEGER},\r\n      </if>\r\n    </set>\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </update>\r\n  <update id=\"updateByPrimaryKey\" parameterType=\"org.example.dataobject.UserDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    update user_info\r\n    set name = #{name,jdbcType=VARCHAR},\r\n      gender = #{gender,jdbcType=INTEGER},\r\n      age = #{age,jdbcType=INTEGER}\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </update>\r\n\r\n  <!-- 需要手动指定  keyProperty=\"id\" useGeneratedKeys=\"true\" -->\r\n  <!-- insertSelective和单纯的insert相比，前者更有优势 -->\r\n  <!-- 因为，如果没有指定对应字段，则会使用设计数据库时的默认字段 -->\r\n  <!-- 而我们在设计数据库时，将默认字段都not null -->\r\n  <!-- 这样对Java程序友好一些 -->\r\n</mapper>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/BackEnd/target/classes/mapping/UserDOMapper.xml b/BackEnd/target/classes/mapping/UserDOMapper.xml
+---- a/BackEnd/target/classes/mapping/UserDOMapper.xml	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/target/classes/mapping/UserDOMapper.xml	(date 1665234021075)
+-@@ -5,7 +5,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     <id column="id" jdbcType="INTEGER" property="id" />
+-     <result column="name" jdbcType="VARCHAR" property="name" />
+-@@ -16,7 +16,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     id, name, gender, age
+-   </sql>
+-@@ -24,7 +24,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     select 
+-     <include refid="Base_Column_List" />
+-@@ -35,23 +35,16 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     delete from user_info
+-     where id = #{id,jdbcType=INTEGER}
+-   </delete>
+--  <!--根据Name来查找表项-->
+--  <select id="selectByUserName" resultMap="BaseResultMap">
+--    select
+--    <include refid="Base_Column_List" />
+--    from user_info
+--    where name = #{name,jdbcType=VARCHAR}
+--  </select>
+-   <insert id="insert" parameterType="org.example.dataobject.UserDO">
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     insert into user_info (id, name, gender, 
+-       age)
+-@@ -62,7 +55,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     insert into user_info
+-     <trim prefix="(" suffix=")" suffixOverrides=",">
+-@@ -98,7 +91,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     update user_info
+-     <set>
+-@@ -118,7 +111,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     update user_info
+-     set name = #{name,jdbcType=VARCHAR},
+-@@ -126,6 +119,13 @@
+-       age = #{age,jdbcType=INTEGER}
+-     where id = #{id,jdbcType=INTEGER}
+-   </update>
+-+  <!--根据Name来查找表项-->
+-+  <select id="selectByUserName" resultMap="BaseResultMap">
+-+    select
+-+    <include refid="Base_Column_List" />
+-+    from user_info
+-+    where name = #{name,jdbcType=VARCHAR}
+-+  </select>
+- 
+-   <!-- 需要手动指定  keyProperty="id" useGeneratedKeys="true" -->
+-   <!-- insertSelective和单纯的insert相比，前者更有优势 -->
+-Index: BackEnd/src/main/java/org/example/dao/UserDOMapper.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package org.example.dao;\r\n\r\nimport org.example.dataobject.UserDO;\r\n\r\npublic interface UserDOMapper {\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method corresponds to the database table user_info\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    int deleteByPrimaryKey(Integer id);\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method corresponds to the database table user_info\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    int insert(UserDO record);\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method corresponds to the database table user_info\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    int insertSelective(UserDO record);\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method corresponds to the database table user_info\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    UserDO selectByPrimaryKey(Integer id);\r\n    UserDO selectByUserName(String name);\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method corresponds to the database table user_info\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    int updateByPrimaryKeySelective(UserDO record);\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method corresponds to the database table user_info\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    int updateByPrimaryKey(UserDO record);\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/BackEnd/src/main/java/org/example/dao/UserDOMapper.java b/BackEnd/src/main/java/org/example/dao/UserDOMapper.java
+---- a/BackEnd/src/main/java/org/example/dao/UserDOMapper.java	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/src/main/java/org/example/dao/UserDOMapper.java	(date 1665234048583)
+-@@ -7,7 +7,7 @@
+-      * This method was generated by MyBatis Generator.
+-      * This method corresponds to the database table user_info
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 20:48:55 CST 2022
+-      */
+-     int deleteByPrimaryKey(Integer id);
+- 
+-@@ -15,7 +15,7 @@
+-      * This method was generated by MyBatis Generator.
+-      * This method corresponds to the database table user_info
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 20:48:55 CST 2022
+-      */
+-     int insert(UserDO record);
+- 
+-@@ -23,7 +23,7 @@
+-      * This method was generated by MyBatis Generator.
+-      * This method corresponds to the database table user_info
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 20:48:55 CST 2022
+-      */
+-     int insertSelective(UserDO record);
+- 
+-@@ -31,7 +31,7 @@
+-      * This method was generated by MyBatis Generator.
+-      * This method corresponds to the database table user_info
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 20:48:55 CST 2022
+-      */
+-     UserDO selectByPrimaryKey(Integer id);
+-     UserDO selectByUserName(String name);
+-@@ -40,7 +40,7 @@
+-      * This method was generated by MyBatis Generator.
+-      * This method corresponds to the database table user_info
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 20:48:55 CST 2022
+-      */
+-     int updateByPrimaryKeySelective(UserDO record);
+- 
+-@@ -48,7 +48,7 @@
+-      * This method was generated by MyBatis Generator.
+-      * This method corresponds to the database table user_info
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 20:48:55 CST 2022
+-      */
+-     int updateByPrimaryKey(UserDO record);
+- }
+-\ No newline at end of file
+-Index: BackEnd/target/classes/mapping/PasswordDOMapper.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\r\n<mapper namespace=\"org.example.dao.PasswordDOMapper\">\r\n  <resultMap id=\"BaseResultMap\" type=\"org.example.dataobject.PasswordDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    <id column=\"id\" jdbcType=\"INTEGER\" property=\"id\" />\r\n    <result column=\"encrpt_password\" jdbcType=\"VARCHAR\" property=\"encrptPassword\" />\r\n    <result column=\"usr_id\" jdbcType=\"INTEGER\" property=\"usrId\" />\r\n  </resultMap>\r\n  <sql id=\"Base_Column_List\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    id, encrpt_password, usr_id\r\n  </sql>\r\n  <select id=\"selectByPrimaryKey\" parameterType=\"java.lang.Integer\" resultMap=\"BaseResultMap\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    select \r\n    <include refid=\"Base_Column_List\" />\r\n    from user_password\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </select>\r\n  <delete id=\"deleteByPrimaryKey\" parameterType=\"java.lang.Integer\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    delete from user_password\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </delete>\r\n  <insert id=\"insert\" parameterType=\"org.example.dataobject.PasswordDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    insert into user_password (id, encrpt_password, usr_id\r\n      )\r\n    values (#{id,jdbcType=INTEGER}, #{encrptPassword,jdbcType=VARCHAR}, #{usrId,jdbcType=INTEGER}\r\n      )\r\n  </insert>\r\n  <insert id=\"insertSelective\" parameterType=\"org.example.dataobject.PasswordDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    insert into user_password\r\n    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\r\n      <if test=\"id != null\">\r\n        id,\r\n      </if>\r\n      <if test=\"encrptPassword != null\">\r\n        encrpt_password,\r\n      </if>\r\n      <if test=\"usrId != null\">\r\n        usr_id,\r\n      </if>\r\n    </trim>\r\n    <trim prefix=\"values (\" suffix=\")\" suffixOverrides=\",\">\r\n      <if test=\"id != null\">\r\n        #{id,jdbcType=INTEGER},\r\n      </if>\r\n      <if test=\"encrptPassword != null\">\r\n        #{encrptPassword,jdbcType=VARCHAR},\r\n      </if>\r\n      <if test=\"usrId != null\">\r\n        #{usrId,jdbcType=INTEGER},\r\n      </if>\r\n    </trim>\r\n  </insert>\r\n  <update id=\"updateByPrimaryKeySelective\" parameterType=\"org.example.dataobject.PasswordDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    update user_password\r\n    <set>\r\n      <if test=\"encrptPassword != null\">\r\n        encrpt_password = #{encrptPassword,jdbcType=VARCHAR},\r\n      </if>\r\n      <if test=\"usrId != null\">\r\n        usr_id = #{usrId,jdbcType=INTEGER},\r\n      </if>\r\n    </set>\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </update>\r\n  <update id=\"updateByPrimaryKey\" parameterType=\"org.example.dataobject.PasswordDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    update user_password\r\n    set encrpt_password = #{encrptPassword,jdbcType=VARCHAR},\r\n      usr_id = #{usrId,jdbcType=INTEGER}\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </update>\r\n\r\n    <!--根据UserId来查找表项-->\r\n  <select id=\"selectByUserId\" parameterType=\"java.lang.Integer\" resultMap=\"BaseResultMap\">\r\n    select\r\n    <include refid=\"Base_Column_List\" />\r\n    from user_password\r\n    where usr_id = #{usrId,jdbcType=INTEGER}\r\n  </select>\r\n</mapper>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/BackEnd/target/classes/mapping/PasswordDOMapper.xml b/BackEnd/target/classes/mapping/PasswordDOMapper.xml
+---- a/BackEnd/target/classes/mapping/PasswordDOMapper.xml	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/target/classes/mapping/PasswordDOMapper.xml	(date 1665234021095)
+-@@ -5,7 +5,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     <id column="id" jdbcType="INTEGER" property="id" />
+-     <result column="encrpt_password" jdbcType="VARCHAR" property="encrptPassword" />
+-@@ -15,7 +15,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     id, encrpt_password, usr_id
+-   </sql>
+-@@ -23,7 +23,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     select 
+-     <include refid="Base_Column_List" />
+-@@ -34,7 +34,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     delete from user_password
+-     where id = #{id,jdbcType=INTEGER}
+-@@ -43,7 +43,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     insert into user_password (id, encrpt_password, usr_id
+-       )
+-@@ -54,7 +54,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     insert into user_password
+-     <trim prefix="(" suffix=")" suffixOverrides=",">
+-@@ -84,7 +84,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     update user_password
+-     <set>
+-@@ -101,7 +101,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     update user_password
+-     set encrpt_password = #{encrptPassword,jdbcType=VARCHAR},
+-Index: BackEnd/target/classes/application.properties
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>server.port=8090\r\nmybatis.mapperLocations=classpath:mapping/*.xml\r\n\r\nspring.datasource.name=pkuEater\r\nspring.datasource.url=jdbc:mysql://47.94.139.212:3306/pkuEater?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf8&useSSL=false\r\nspring.datasource.username=root\r\nspring.datasource.password=pku123456\r\n\r\nspring.datasource.type=com.alibaba.druid.pool.DruidDataSource\r\nspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>ISO-8859-1
+-===================================================================
+-diff --git a/BackEnd/target/classes/application.properties b/BackEnd/target/classes/application.properties
+---- a/BackEnd/target/classes/application.properties	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/target/classes/application.properties	(date 1665385883915)
+-@@ -1,4 +1,4 @@
+--server.port=8090
+-+server.port=8080
+- mybatis.mapperLocations=classpath:mapping/*.xml
+- 
+- spring.datasource.name=pkuEater
+-Index: BackEnd/pom.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><project xmlns=\"http://maven.apache.org/POM/4.0.0\"\r\n\txmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n\txsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\r\n\r\n\t<modelVersion>4.0.0</modelVersion>\r\n\t<groupId>org.example</groupId>\r\n\t<artifactId>BackEnd</artifactId>\r\n\t<packaging>war</packaging>\r\n\t<version>1.0-SNAPSHOT</version>\r\n\t<!-- TODO project name  -->\r\n\t<name>quickstart</name>\r\n\t<description></description>\r\n\r\n\t<!-- TODO\r\n\t\t<organization>\r\n\t\t<name>company name</name>\r\n\t\t<url>company url</url>\r\n\t\t</organization>\r\n\t-->\r\n\r\n\t<!-- 1、引入SpringBoot相关的依赖 -->\r\n\t<parent>\r\n\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t<artifactId>spring-boot-starter-parent</artifactId>\r\n\t\t<version>2.7.4</version>\r\n\t\t<relativePath/> <!-- lookup parent from repository -->\r\n\t</parent>\r\n\r\n\t<licenses>\r\n\t\t<license>\r\n\t\t\t<name>The Apache Software License, Version 2.0</name>\r\n\t\t\t<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>\r\n\t\t\t<distribution>repo</distribution>\r\n\t\t</license>\r\n\t</licenses>\r\n\r\n\t<dependencies>\r\n\t\t<!--  WICKET DEPENDENCIES -->\r\n\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.apache.wicket</groupId>\r\n\t\t\t<artifactId>wicket</artifactId>\r\n\t\t\t<version>${wicket.version}</version>\r\n\t\t</dependency>\r\n\r\n\t\t<!-- 2、 引入SpringBoot的依赖包 -->\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t\t<artifactId>spring-boot-starter</artifactId>\r\n\t\t</dependency>\r\n\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t\t<artifactId>spring-boot-starter-web</artifactId>\r\n\t\t</dependency>\r\n\r\n\t\t<!-- 3、 引入的第三个：java连接mysql的connector的jar包 -->\r\n\t\t<dependency>\r\n\t\t\t<groupId>mysql</groupId>\r\n\t\t\t<artifactId>mysql-connector-java</artifactId>\r\n\t\t</dependency>\r\n\t\t<!-- 4、引入的第四个：阿里的德鲁伊连接池，管理mysql连接的jar包 -->\r\n\t\t<dependency>\r\n\t\t\t<groupId>com.alibaba</groupId>\r\n\t\t\t<artifactId>druid</artifactId>\r\n\t\t\t<version>1.2.13-SNSAPSHOT</version>\r\n\t\t</dependency>\r\n\t\t<!-- 5、引入的第五个：Mybatis相关的jar包 -->\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.mybatis.spring.boot</groupId>\r\n\t\t\t<artifactId>mybatis-spring-boot-starter</artifactId>\r\n\t\t\t<version>2.2.2</version>\r\n\t\t</dependency>\r\n\t\t<!-- 6.Apache common lang -->\r\n\t\t<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.apache.commons</groupId>\r\n\t\t\t<artifactId>commons-lang3</artifactId>\r\n\t\t\t<version>3.12.0</version>\r\n\t\t</dependency>\r\n\r\n\t\t<!-- OPTIONAL \r\n\t\t\t<dependency>\r\n\t\t\t<groupId>org.apache.wicket</groupId>\r\n\t\t\t<artifactId>wicket-extensions</artifactId>\r\n\t\t\t<version>${wicket.version}</version>\r\n\t\t\t</dependency>\r\n\t\t-->\r\n\r\n\t\t<!-- LOGGING DEPENDENCIES - LOG4J -->\r\n\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.slf4j</groupId>\r\n\t\t\t<artifactId>slf4j-log4j12</artifactId>\r\n\t\t\t<version>2.0.1</version>\r\n\t\t</dependency>\r\n\t\t<dependency>\r\n\t\t\t<groupId>log4j</groupId>\r\n\t\t\t<artifactId>log4j</artifactId>\r\n\t\t\t<version>1.2.17</version>\r\n\t\t</dependency>\r\n\r\n\t\t<!--  JUNIT DEPENDENCY FOR TESTING -->\r\n\t\t <dependency>\r\n\t\t\t\t <groupId>junit</groupId>\r\n\t\t\t\t <artifactId>junit</artifactId>\r\n\t\t\t <scope>test</scope>\r\n\t\t </dependency>\r\n\t</dependencies>\r\n\r\n\t<build>\r\n\t\t<resources>\r\n\t\t\t<resource>\r\n\t\t\t\t<filtering>false</filtering>\r\n\t\t\t\t<directory>src/main/resources</directory>\r\n\t\t\t</resource>\r\n\t\t\t<resource>\r\n\t\t\t\t<filtering>false</filtering>\r\n\t\t\t\t<directory>src/main/java</directory>\r\n\t\t\t\t<includes>\r\n\t\t\t\t\t<include>**</include>\r\n\t\t\t\t</includes>\r\n\t\t\t\t<excludes>\r\n\t\t\t\t\t<exclude>**/*.java</exclude>\r\n\t\t\t\t</excludes>\r\n\t\t\t</resource>\r\n\t\t</resources>\r\n\t\t<testResources>\r\n\t\t\t<testResource>\r\n\t\t\t\t<filtering>false</filtering>\r\n\t\t\t\t<directory>src/test/java</directory>\r\n\t\t\t\t<includes>\r\n\t\t\t\t\t<include>**</include>\r\n\t\t\t\t</includes>\r\n\t\t\t\t<excludes>\r\n\t\t\t\t\t<exclude>**/*.java</exclude>\r\n\t\t\t\t</excludes>\r\n\t\t\t</testResource>\r\n\t\t</testResources>\r\n\t\t<plugins>\r\n\r\n\t\t\t<plugin>\r\n\t\t\t\t<!-- 引入mybatis的plugin -->\r\n\t\t\t\t<groupId>org.mybatis.generator</groupId>\r\n\t\t\t\t<artifactId>mybatis-generator-maven-plugin</artifactId>\r\n\t\t\t\t<version>1.3.5</version>\r\n\r\n\t\t\t\t<dependencies>\r\n\t\t\t\t\t<!-- 7、 第七个引入的：mybatis生成器的core相关jar包  -->\r\n\t\t\t\t\t<dependency>\r\n\t\t\t\t\t\t<groupId>org.mybatis.generator</groupId>\r\n\t\t\t\t\t\t<artifactId>mybatis-generator-core</artifactId>\r\n\t\t\t\t\t\t<version>1.3.5</version>\r\n\t\t\t\t\t</dependency>\r\n\t\t\t\t\t<!-- 8、 在mybatis的插件里再引入一遍mysql的连接jar包 -->\r\n\t\t\t\t\t<!-- 上面曾经引入过，是服务端java代码与mysql连接 -->\r\n\t\t\t\t\t<!-- 这里再次声明，是mybatis插件和mysql连接 -->\r\n\t\t\t\t\t<!-- 虽说老师这么写了， 但我个人觉得没必要重复引入jar包啊 -->\r\n\t\t\t\t\t<!-- 老师给出的解释是：要生成的mybatis插件，需要借助相关的依赖 -->\r\n\t\t\t\t\t<dependency>\r\n\t\t\t\t\t\t<groupId>mysql</groupId>\r\n\t\t\t\t\t\t<artifactId>mysql-connector-java</artifactId>\r\n\t\t\t\t\t\t<version>8.0.21</version>\r\n\t\t\t\t\t</dependency>\r\n\t\t\t\t</dependencies>\r\n\r\n\t\t\t\t<!-- executions : 执行-->\r\n\t\t\t\t<!-- 9、配置mybatis generator 插件的执行阶段phase以及执行目的goal -->\r\n\t\t\t\t<executions>\r\n\t\t\t\t\t<execution>\r\n\t\t\t\t\t\t<id>mybatis generator</id>\r\n\t\t\t\t\t\t<phase>package</phase>\r\n\t\t\t\t\t\t<goals>\r\n\t\t\t\t\t\t\t<goal>generate</goal>\r\n\t\t\t\t\t\t</goals>\r\n\t\t\t\t\t</execution>\r\n\t\t\t\t</executions>\r\n\r\n\t\t\t\t<!-- 10、mybatis generator 插件的相关属性配置 -->\r\n\t\t\t\t<configuration>\r\n\t\t\t\t\t<!-- verbose : 冗余的 ， 允许移动生成的文件 -->\r\n\t\t\t\t\t<verbose>true</verbose>\r\n\t\t\t\t\t<!-- 新生成的覆盖旧生成的，实际工作中慎用 -->\r\n\t\t\t\t\t<overwrite>true</overwrite>\r\n\t\t\t\t\t<!-- 指定mybatis配置文件的路径 -->\r\n\t\t\t\t\t<configurationFile>src/main/resources/mybatis-generator.xml</configurationFile>\r\n\t\t\t\t</configuration>\r\n\r\n\t\t\t</plugin>\r\n\r\n\t\t</plugins>\r\n\t</build>\r\n\r\n\t<properties>\r\n\t\t<wicket.version>1.3.2</wicket.version>\r\n\t</properties>\r\n\r\n</project>\r\n
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/BackEnd/pom.xml b/BackEnd/pom.xml
+---- a/BackEnd/pom.xml	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/pom.xml	(date 1665383294711)
+-@@ -5,8 +5,8 @@
+- 	<modelVersion>4.0.0</modelVersion>
+- 	<groupId>org.example</groupId>
+- 	<artifactId>BackEnd</artifactId>
+--	<packaging>war</packaging>
+--	<version>1.0-SNAPSHOT</version>
+-+	<packaging>jar</packaging>
+-+	<version>1.0</version>
+- 	<!-- TODO project name  -->
+- 	<name>quickstart</name>
+- 	<description></description>
+-@@ -78,21 +78,13 @@
+- 			<artifactId>commons-lang3</artifactId>
+- 			<version>3.12.0</version>
+- 		</dependency>
+--
+--		<!-- OPTIONAL 
+--			<dependency>
+--			<groupId>org.apache.wicket</groupId>
+--			<artifactId>wicket-extensions</artifactId>
+--			<version>${wicket.version}</version>
+--			</dependency>
+--		-->
+- 
+- 		<!-- LOGGING DEPENDENCIES - LOG4J -->
+- 
+- 		<dependency>
+- 			<groupId>org.slf4j</groupId>
+- 			<artifactId>slf4j-log4j12</artifactId>
+--			<version>2.0.1</version>
+-+			<version>2.0.3</version>
+- 		</dependency>
+- 		<dependency>
+- 			<groupId>log4j</groupId>
+-@@ -138,6 +130,15 @@
+- 			</testResource>
+- 		</testResources>
+- 		<plugins>
+-+			<!-- 引入mybatis的plugin -->
+-+			<plugin>
+-+				<groupId>org.springframework.boot</groupId>
+-+				<artifactId>spring-boot-maven-plugin</artifactId>
+-+				<version>2.7.4</version>
+-+				<configuration>
+-+					<mainClass>org.example.App</mainClass>
+-+				</configuration>
+-+			</plugin>
+- 
+- 			<plugin>
+- 				<!-- 引入mybatis的plugin -->
+-@@ -169,7 +170,7 @@
+- 				<executions>
+- 					<execution>
+- 						<id>mybatis generator</id>
+--						<phase>package</phase>
+-+						<phase>deploy</phase>
+- 						<goals>
+- 							<goal>generate</goal>
+- 						</goals>
+-Index: BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package org.example.dao;\r\n\r\nimport org.example.dataobject.PasswordDO;\r\n\r\npublic interface PasswordDOMapper {\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method corresponds to the database table user_password\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    int deleteByPrimaryKey(Integer id);\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method corresponds to the database table user_password\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    int insert(PasswordDO record);\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method corresponds to the database table user_password\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    int insertSelective(PasswordDO record);\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method corresponds to the database table user_password\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    PasswordDO selectByPrimaryKey(Integer id);\r\n\r\n    PasswordDO selectByUserId(Integer id);\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method corresponds to the database table user_password\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    int updateByPrimaryKeySelective(PasswordDO record);\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method corresponds to the database table user_password\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    int updateByPrimaryKey(PasswordDO record);\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java b/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java
+---- a/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java	(date 1665234041949)
+-@@ -7,7 +7,7 @@
+-      * This method was generated by MyBatis Generator.
+-      * This method corresponds to the database table user_password
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 20:48:55 CST 2022
+-      */
+-     int deleteByPrimaryKey(Integer id);
+- 
+-@@ -15,7 +15,7 @@
+-      * This method was generated by MyBatis Generator.
+-      * This method corresponds to the database table user_password
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 20:48:55 CST 2022
+-      */
+-     int insert(PasswordDO record);
+- 
+-@@ -23,7 +23,7 @@
+-      * This method was generated by MyBatis Generator.
+-      * This method corresponds to the database table user_password
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 20:48:55 CST 2022
+-      */
+-     int insertSelective(PasswordDO record);
+- 
+-@@ -31,17 +31,16 @@
+-      * This method was generated by MyBatis Generator.
+-      * This method corresponds to the database table user_password
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 20:48:55 CST 2022
+-      */
+-     PasswordDO selectByPrimaryKey(Integer id);
+--
+-     PasswordDO selectByUserId(Integer id);
+- 
+-     /**
+-      * This method was generated by MyBatis Generator.
+-      * This method corresponds to the database table user_password
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 20:48:55 CST 2022
+-      */
+-     int updateByPrimaryKeySelective(PasswordDO record);
+- 
+-@@ -49,7 +48,7 @@
+-      * This method was generated by MyBatis Generator.
+-      * This method corresponds to the database table user_password
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 20:48:55 CST 2022
+-      */
+-     int updateByPrimaryKey(PasswordDO record);
+- }
+-\ No newline at end of file
+-Index: BackEnd/src/main/java/org/example/dataobject/UserDO.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package org.example.dataobject;\r\n\r\npublic class UserDO {\r\n    /**\r\n     *\r\n     * This field was generated by MyBatis Generator.\r\n     * This field corresponds to the database column user_info.id\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    private Integer id;\r\n\r\n    /**\r\n     *\r\n     * This field was generated by MyBatis Generator.\r\n     * This field corresponds to the database column user_info.name\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    private String name;\r\n\r\n    /**\r\n     *\r\n     * This field was generated by MyBatis Generator.\r\n     * This field corresponds to the database column user_info.gender\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    private Integer gender;\r\n\r\n    /**\r\n     *\r\n     * This field was generated by MyBatis Generator.\r\n     * This field corresponds to the database column user_info.age\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    private Integer age;\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method returns the value of the database column user_info.id\r\n     *\r\n     * @return the value of user_info.id\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public Integer getId() {\r\n        return id;\r\n    }\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method sets the value of the database column user_info.id\r\n     *\r\n     * @param id the value for user_info.id\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public void setId(Integer id) {\r\n        this.id = id;\r\n    }\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method returns the value of the database column user_info.name\r\n     *\r\n     * @return the value of user_info.name\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public String getName() {\r\n        return name;\r\n    }\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method sets the value of the database column user_info.name\r\n     *\r\n     * @param name the value for user_info.name\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public void setName(String name) {\r\n        this.name = name == null ? null : name.trim();\r\n    }\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method returns the value of the database column user_info.gender\r\n     *\r\n     * @return the value of user_info.gender\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public Integer getGender() {\r\n        return gender;\r\n    }\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method sets the value of the database column user_info.gender\r\n     *\r\n     * @param gender the value for user_info.gender\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public void setGender(Integer gender) {\r\n        this.gender = gender;\r\n    }\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method returns the value of the database column user_info.age\r\n     *\r\n     * @return the value of user_info.age\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public Integer getAge() {\r\n        return age;\r\n    }\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method sets the value of the database column user_info.age\r\n     *\r\n     * @param age the value for user_info.age\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public void setAge(Integer age) {\r\n        this.age = age;\r\n    }\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/BackEnd/src/main/java/org/example/dataobject/UserDO.java b/BackEnd/src/main/java/org/example/dataobject/UserDO.java
+---- a/BackEnd/src/main/java/org/example/dataobject/UserDO.java	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/src/main/java/org/example/dataobject/UserDO.java	(date 1665234021100)
+-@@ -6,7 +6,7 @@
+-      * This field was generated by MyBatis Generator.
+-      * This field corresponds to the database column user_info.id
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     private Integer id;
+- 
+-@@ -15,7 +15,7 @@
+-      * This field was generated by MyBatis Generator.
+-      * This field corresponds to the database column user_info.name
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     private String name;
+- 
+-@@ -24,7 +24,7 @@
+-      * This field was generated by MyBatis Generator.
+-      * This field corresponds to the database column user_info.gender
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     private Integer gender;
+- 
+-@@ -33,7 +33,7 @@
+-      * This field was generated by MyBatis Generator.
+-      * This field corresponds to the database column user_info.age
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     private Integer age;
+- 
+-@@ -43,7 +43,7 @@
+-      *
+-      * @return the value of user_info.id
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public Integer getId() {
+-         return id;
+-@@ -55,7 +55,7 @@
+-      *
+-      * @param id the value for user_info.id
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public void setId(Integer id) {
+-         this.id = id;
+-@@ -67,7 +67,7 @@
+-      *
+-      * @return the value of user_info.name
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public String getName() {
+-         return name;
+-@@ -79,7 +79,7 @@
+-      *
+-      * @param name the value for user_info.name
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public void setName(String name) {
+-         this.name = name == null ? null : name.trim();
+-@@ -91,7 +91,7 @@
+-      *
+-      * @return the value of user_info.gender
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public Integer getGender() {
+-         return gender;
+-@@ -103,7 +103,7 @@
+-      *
+-      * @param gender the value for user_info.gender
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public void setGender(Integer gender) {
+-         this.gender = gender;
+-@@ -115,7 +115,7 @@
+-      *
+-      * @return the value of user_info.age
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public Integer getAge() {
+-         return age;
+-@@ -127,7 +127,7 @@
+-      *
+-      * @param age the value for user_info.age
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public void setAge(Integer age) {
+-         this.age = age;
+-Index: .idea/workspace.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"NONE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"72dae969-5783-4578-9b4a-3cefce4e8bd5\" name=\"变更\" comment=\"更新README\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/codeStyles/Project.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/codeStyles/Project.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/misc.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/misc.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/UserDOMapper.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/UserDOMapper.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/UserDO.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/UserDO.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/error/EmBusinessError.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/error/EmBusinessError.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/UserService.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/UserService.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/target/classes/mapping/PasswordDOMapper.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/target/classes/mapping/PasswordDOMapper.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/README.md\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/README.md\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"CodeStyleSettingsInfer\">\r\n    <option name=\"done\" value=\"true\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Class\" />\r\n        <option value=\"Interface\" />\r\n        <option value=\"Enum\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"PUSH_TAGS\">\r\n      <GitPushTagMode>\r\n        <option name=\"argument\" value=\"--follow-tags\" />\r\n        <option name=\"title\" value=\"Current Branch\" />\r\n      </GitPushTagMode>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"useMavenConfig\" value=\"true\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProblemsViewState\">\r\n    <option name=\"selectedTabId\" value=\"CurrentFile\" />\r\n  </component>\r\n  <component name=\"ProjectCodeStyleSettingsMigration\">\r\n    <option name=\"version\" value=\"2\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2FDfFMJt7PKnLyoX2O4JyNnBqjA\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"last_opened_file_path\": \"D:/big_homework/android/groupwork/ClientEnd\",\n    \"project.structure.last.edited\": \"项目\",\n    \"project.structure.proportion\": \"0.15\",\n    \"project.structure.side.proportion\": \"0.2\",\n    \"settings.editor.selected.configurable\": \"configurable.group.editor\"\n  }\n}]]></component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CreateClassDialog.RecentsKey\">\r\n      <recent name=\"service.impl\" />\r\n    </key>\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\java\" />\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\resources\\xml\" />\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\res\" />\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\.idea\" />\r\n    </key>\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\resources\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"应用程序.App\">\r\n    <configuration name=\"App\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.example.App\" />\r\n      <module name=\"BackEnd\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"org.example.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration name=\"mybatis-generator\" type=\"MavenRunConfiguration\" factoryName=\"Maven\">\r\n      <MavenSettings>\r\n        <option name=\"myGeneralSettings\" />\r\n        <option name=\"myRunnerSettings\" />\r\n        <option name=\"myRunnerParameters\">\r\n          <MavenRunnerParameters>\r\n            <option name=\"profiles\">\r\n              <set />\r\n            </option>\r\n            <option name=\"goals\">\r\n              <list>\r\n                <option value=\"mybatis-generator:generate\" />\r\n              </list>\r\n            </option>\r\n            <option name=\"pomFileName\" />\r\n            <option name=\"profilesMap\">\r\n              <map />\r\n            </option>\r\n            <option name=\"resolveToWorkspace\" value=\"false\" />\r\n            <option name=\"workingDirPath\" value=\"$PROJECT_DIR$/BackEnd\" />\r\n          </MavenRunnerParameters>\r\n        </option>\r\n      </MavenSettings>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <list>\r\n      <item itemvalue=\"Maven.mybatis-generator\" />\r\n      <item itemvalue=\"应用程序.App\" />\r\n    </list>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"应用程序.App\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"应用程序级\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"默认任务\">\r\n      <changelist id=\"72dae969-5783-4578-9b4a-3cefce4e8bd5\" name=\"变更\" comment=\"\" />\r\n      <created>1664031470652</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1664031470652</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"使用mybatis将本地数据库连接进去了，要改成远程数据库可能需要开放防火墙，之后弄\">\r\n      <created>1664098640925</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664098640925</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"成功连接上数据库服务器\">\r\n      <created>1664115561415</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664115561415</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"成功连接上数据库服务器\">\r\n      <created>1664692245879</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664692245879</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"完成未经优化的注册\">\r\n      <created>1664715937945</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664715937945</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"修正了merge导致的错误\">\r\n      <created>1664717820766</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664717820766</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"给注册加上了报错\">\r\n      <created>1664787083803</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664787083803</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00007\" summary=\"更新README\">\r\n      <created>1664889901382</created>\r\n      <option name=\"number\" value=\"00007\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664889901382</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"8\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"使用mybatis将本地数据库连接进去了，要改成远程数据库可能需要开放防火墙，之后弄\" />\r\n    <MESSAGE value=\"成功连接上数据库服务器\" />\r\n    <MESSAGE value=\"完成未经优化的注册\" />\r\n    <MESSAGE value=\"修正了merge导致的错误\" />\r\n    <MESSAGE value=\"给注册加上了报错\" />\r\n    <MESSAGE value=\"更新README\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"更新README\" />\r\n  </component>\r\n</project>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+---- a/.idea/workspace.xml	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/.idea/workspace.xml	(date 1665408002592)
+-@@ -4,26 +4,36 @@
+-     <option name="autoReloadType" value="NONE" />
+-   </component>
+-   <component name="ChangeListManager">
+--    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="更新README">
+--      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+-+    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="用户名不允许重复&amp;登录功能">
+-+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_slf4j_slf4j_reload4j_2_0_1.xml" beforeDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_14_49____.xml" beforeDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_15_10____.xml" beforeDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_2_19_08____.xml" beforeDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]/UserController.class" beforeDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]/shelved.patch" beforeDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_2_15_10_取消提交了变更_[变更]/shelved.patch" beforeDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_2_19_08_取消提交了变更_[变更]/shelved.patch" beforeDir="false" />
+-       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/BackEnd/BackEnd.iml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/BackEnd.iml" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/BackEnd/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/pom.xml" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/App.java" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/PasswordDOMapper.java" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/UserDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/UserDOMapper.java" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/UserDO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/UserDO.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/error/EmBusinessError.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/error/EmBusinessError.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/UserService.java" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/application.properties" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/application.properties" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mapping/PasswordDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mapping/PasswordDOMapper.xml" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mapping/UserDOMapper.xml" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/App.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/App.class" afterDir="false" />
+-       <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/PasswordDOMapper.class" afterDir="false" />
+--      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/UserDOMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/UserDOMapper.class" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/error/EmBusinessError.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/error/EmBusinessError.class" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/UserService.class" afterDir="false" />
+-+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/impl/UserServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/impl/UserServiceImpl.class" afterDir="false" />
+-     </list>
+-     <option name="SHOW_DIALOG" value="false" />
+-     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+-@@ -72,15 +82,15 @@
+-     <option name="hideEmptyMiddlePackages" value="true" />
+-     <option name="showLibraryContents" value="true" />
+-   </component>
+--  <component name="PropertiesComponent"><![CDATA[{
+--  "keyToString": {
+--    "last_opened_file_path": "D:/big_homework/android/groupwork/ClientEnd",
+--    "project.structure.last.edited": "项目",
+--    "project.structure.proportion": "0.15",
+--    "project.structure.side.proportion": "0.2",
+--    "settings.editor.selected.configurable": "configurable.group.editor"
+-+  <component name="PropertiesComponent">{
+-+  &quot;keyToString&quot;: {
+-+    &quot;last_opened_file_path&quot;: &quot;D:/big_homework/android/LoginDemo-master&quot;,
+-+    &quot;project.structure.last.edited&quot;: &quot;工件&quot;,
+-+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+-+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+-+    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;
+-   }
+--}]]></component>
+-+}</component>
+-   <component name="RecentsManager">
+-     <key name="CreateClassDialog.RecentsKey">
+-       <recent name="service.impl" />
+-@@ -202,7 +212,14 @@
+-       <option name="project" value="LOCAL" />
+-       <updated>1664889901382</updated>
+-     </task>
+--    <option name="localTasksCounter" value="8" />
+-+    <task id="LOCAL-00008" summary="用户名不允许重复&amp;登录功能">
+-+      <created>1665133594468</created>
+-+      <option name="number" value="00008" />
+-+      <option name="presentableId" value="LOCAL-00008" />
+-+      <option name="project" value="LOCAL" />
+-+      <updated>1665133594468</updated>
+-+    </task>
+-+    <option name="localTasksCounter" value="9" />
+-     <servers />
+-   </component>
+-   <component name="Vcs.Log.Tabs.Properties">
+-@@ -223,6 +240,7 @@
+-     <MESSAGE value="修正了merge导致的错误" />
+-     <MESSAGE value="给注册加上了报错" />
+-     <MESSAGE value="更新README" />
+--    <option name="LAST_COMMIT_MESSAGE" value="更新README" />
+-+    <MESSAGE value="用户名不允许重复&amp;登录功能" />
+-+    <option name="LAST_COMMIT_MESSAGE" value="用户名不允许重复&amp;登录功能" />
+-   </component>
+- </project>
+-\ No newline at end of file
+-Index: BackEnd/BackEnd.iml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule=\"true\" type=\"JAVA_MODULE\" version=\"4\">\r\n  <component name=\"NewModuleRootManager\" LANGUAGE_LEVEL=\"JDK_1_8\">\r\n    <output url=\"file://$MODULE_DIR$/target/classes\" />\r\n    <output-test url=\"file://$MODULE_DIR$/target/test-classes\" />\r\n    <content url=\"file://$MODULE_DIR$\">\r\n      <sourceFolder url=\"file://$MODULE_DIR$/src/main/java\" isTestSource=\"false\" />\r\n      <sourceFolder url=\"file://$MODULE_DIR$/src/main/resources\" type=\"java-resource\" />\r\n      <excludeFolder url=\"file://$MODULE_DIR$/target\" />\r\n    </content>\r\n    <orderEntry type=\"inheritedJdk\" />\r\n    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.apache.wicket:wicket:1.3.2\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.slf4j:slf4j-api:1.7.36\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter:2.7.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot:2.7.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-context:5.3.23\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-autoconfigure:2.7.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-logging:2.7.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: ch.qos.logback:logback-classic:1.2.11\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: ch.qos.logback:logback-core:1.2.11\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.apache.logging.log4j:log4j-to-slf4j:2.17.2\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.apache.logging.log4j:log4j-api:2.17.2\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.slf4j:jul-to-slf4j:1.7.36\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: jakarta.annotation:jakarta.annotation-api:1.3.5\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-core:5.3.23\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-jcl:5.3.23\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.yaml:snakeyaml:1.30\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-web:2.7.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-json:2.7.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.core:jackson-databind:2.13.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.core:jackson-annotations:2.13.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.core:jackson-core:2.13.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.13.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: com.fasterxml.jackson.module:jackson-module-parameter-names:2.13.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-tomcat:2.7.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.apache.tomcat.embed:tomcat-embed-core:9.0.65\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.apache.tomcat.embed:tomcat-embed-el:9.0.65\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.apache.tomcat.embed:tomcat-embed-websocket:9.0.65\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-web:5.3.23\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-beans:5.3.23\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-webmvc:5.3.23\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-aop:5.3.23\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-expression:5.3.23\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: mysql:mysql-connector-java:8.0.30\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: com.alibaba:druid:1.2.13-SNSAPSHOT\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.2\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework.boot:spring-boot-starter-jdbc:2.7.4\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: com.zaxxer:HikariCP:4.0.3\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-jdbc:5.3.23\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.springframework:spring-tx:5.3.23\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.mybatis.spring.boot:mybatis-spring-boot-autoconfigure:2.2.2\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.mybatis:mybatis:3.5.9\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.mybatis:mybatis-spring:2.0.7\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.apache.commons:commons-lang3:3.12.0\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: org.slf4j:slf4j-reload4j:2.0.1\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: ch.qos.reload4j:reload4j:1.2.22\" level=\"project\" />\r\n    <orderEntry type=\"library\" name=\"Maven: log4j:log4j:1.2.17\" level=\"project\" />\r\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: junit:junit:4.13.2\" level=\"project\" />\r\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.hamcrest:hamcrest-core:2.2\" level=\"project\" />\r\n    <orderEntry type=\"library\" scope=\"TEST\" name=\"Maven: org.hamcrest:hamcrest:2.2\" level=\"project\" />\r\n  </component>\r\n</module>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/BackEnd/BackEnd.iml b/BackEnd/BackEnd.iml
+---- a/BackEnd/BackEnd.iml	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/BackEnd.iml	(date 1665383086582)
+-@@ -54,7 +54,7 @@
+-     <orderEntry type="library" name="Maven: org.mybatis:mybatis:3.5.9" level="project" />
+-     <orderEntry type="library" name="Maven: org.mybatis:mybatis-spring:2.0.7" level="project" />
+-     <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.12.0" level="project" />
+--    <orderEntry type="library" name="Maven: org.slf4j:slf4j-reload4j:2.0.1" level="project" />
+-+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-reload4j:2.0.3" level="project" />
+-     <orderEntry type="library" name="Maven: ch.qos.reload4j:reload4j:1.2.22" level="project" />
+-     <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
+-     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.13.2" level="project" />
+-Index: BackEnd/src/main/resources/mapping/PasswordDOMapper.xml
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<!DOCTYPE mapper PUBLIC \"-//mybatis.org//DTD Mapper 3.0//EN\" \"http://mybatis.org/dtd/mybatis-3-mapper.dtd\">\r\n<mapper namespace=\"org.example.dao.PasswordDOMapper\">\r\n  <resultMap id=\"BaseResultMap\" type=\"org.example.dataobject.PasswordDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    <id column=\"id\" jdbcType=\"INTEGER\" property=\"id\" />\r\n    <result column=\"encrpt_password\" jdbcType=\"VARCHAR\" property=\"encrptPassword\" />\r\n    <result column=\"usr_id\" jdbcType=\"INTEGER\" property=\"usrId\" />\r\n  </resultMap>\r\n  <sql id=\"Base_Column_List\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    id, encrpt_password, usr_id\r\n  </sql>\r\n  <select id=\"selectByPrimaryKey\" parameterType=\"java.lang.Integer\" resultMap=\"BaseResultMap\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    select \r\n    <include refid=\"Base_Column_List\" />\r\n    from user_password\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </select>\r\n  <delete id=\"deleteByPrimaryKey\" parameterType=\"java.lang.Integer\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    delete from user_password\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </delete>\r\n  <insert id=\"insert\" parameterType=\"org.example.dataobject.PasswordDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    insert into user_password (id, encrpt_password, usr_id\r\n      )\r\n    values (#{id,jdbcType=INTEGER}, #{encrptPassword,jdbcType=VARCHAR}, #{usrId,jdbcType=INTEGER}\r\n      )\r\n  </insert>\r\n  <insert id=\"insertSelective\" parameterType=\"org.example.dataobject.PasswordDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    insert into user_password\r\n    <trim prefix=\"(\" suffix=\")\" suffixOverrides=\",\">\r\n      <if test=\"id != null\">\r\n        id,\r\n      </if>\r\n      <if test=\"encrptPassword != null\">\r\n        encrpt_password,\r\n      </if>\r\n      <if test=\"usrId != null\">\r\n        usr_id,\r\n      </if>\r\n    </trim>\r\n    <trim prefix=\"values (\" suffix=\")\" suffixOverrides=\",\">\r\n      <if test=\"id != null\">\r\n        #{id,jdbcType=INTEGER},\r\n      </if>\r\n      <if test=\"encrptPassword != null\">\r\n        #{encrptPassword,jdbcType=VARCHAR},\r\n      </if>\r\n      <if test=\"usrId != null\">\r\n        #{usrId,jdbcType=INTEGER},\r\n      </if>\r\n    </trim>\r\n  </insert>\r\n  <update id=\"updateByPrimaryKeySelective\" parameterType=\"org.example.dataobject.PasswordDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    update user_password\r\n    <set>\r\n      <if test=\"encrptPassword != null\">\r\n        encrpt_password = #{encrptPassword,jdbcType=VARCHAR},\r\n      </if>\r\n      <if test=\"usrId != null\">\r\n        usr_id = #{usrId,jdbcType=INTEGER},\r\n      </if>\r\n    </set>\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </update>\r\n  <update id=\"updateByPrimaryKey\" parameterType=\"org.example.dataobject.PasswordDO\">\r\n    <!--\r\n      WARNING - @mbg.generated\r\n      This element is automatically generated by MyBatis Generator, do not modify.\r\n      This element was generated on Thu Oct 06 11:16:21 CST 2022.\r\n    -->\r\n    update user_password\r\n    set encrpt_password = #{encrptPassword,jdbcType=VARCHAR},\r\n      usr_id = #{usrId,jdbcType=INTEGER}\r\n    where id = #{id,jdbcType=INTEGER}\r\n  </update>\r\n\r\n    <!--根据UserId来查找表项-->\r\n  <select id=\"selectByUserId\" parameterType=\"java.lang.Integer\" resultMap=\"BaseResultMap\">\r\n    select\r\n    <include refid=\"Base_Column_List\" />\r\n    from user_password\r\n    where usr_id = #{usrId,jdbcType=INTEGER}\r\n  </select>\r\n</mapper>
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml b/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml
+---- a/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/src/main/resources/mapping/PasswordDOMapper.xml	(date 1665234021095)
+-@@ -5,7 +5,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     <id column="id" jdbcType="INTEGER" property="id" />
+-     <result column="encrpt_password" jdbcType="VARCHAR" property="encrptPassword" />
+-@@ -15,7 +15,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     id, encrpt_password, usr_id
+-   </sql>
+-@@ -23,7 +23,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     select 
+-     <include refid="Base_Column_List" />
+-@@ -34,7 +34,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     delete from user_password
+-     where id = #{id,jdbcType=INTEGER}
+-@@ -43,7 +43,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     insert into user_password (id, encrpt_password, usr_id
+-       )
+-@@ -54,7 +54,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     insert into user_password
+-     <trim prefix="(" suffix=")" suffixOverrides=",">
+-@@ -84,7 +84,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     update user_password
+-     <set>
+-@@ -101,7 +101,7 @@
+-     <!--
+-       WARNING - @mbg.generated
+-       This element is automatically generated by MyBatis Generator, do not modify.
+--      This element was generated on Thu Oct 06 11:16:21 CST 2022.
+-+      This element was generated on Sat Oct 08 21:00:21 CST 2022.
+-     -->
+-     update user_password
+-     set encrpt_password = #{encrptPassword,jdbcType=VARCHAR},
+-Index: BackEnd/src/main/java/org/example/dataobject/PasswordDO.java
+-IDEA additional info:
+-Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+-<+>package org.example.dataobject;\r\n\r\npublic class PasswordDO {\r\n    /**\r\n     *\r\n     * This field was generated by MyBatis Generator.\r\n     * This field corresponds to the database column user_password.id\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    private Integer id;\r\n\r\n    /**\r\n     *\r\n     * This field was generated by MyBatis Generator.\r\n     * This field corresponds to the database column user_password.encrpt_password\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    private String encrptPassword;\r\n\r\n    /**\r\n     *\r\n     * This field was generated by MyBatis Generator.\r\n     * This field corresponds to the database column user_password.usr_id\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    private Integer usrId;\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method returns the value of the database column user_password.id\r\n     *\r\n     * @return the value of user_password.id\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public Integer getId() {\r\n        return id;\r\n    }\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method sets the value of the database column user_password.id\r\n     *\r\n     * @param id the value for user_password.id\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public void setId(Integer id) {\r\n        this.id = id;\r\n    }\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method returns the value of the database column user_password.encrpt_password\r\n     *\r\n     * @return the value of user_password.encrpt_password\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public String getEncrptPassword() {\r\n        return encrptPassword;\r\n    }\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method sets the value of the database column user_password.encrpt_password\r\n     *\r\n     * @param encrptPassword the value for user_password.encrpt_password\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public void setEncrptPassword(String encrptPassword) {\r\n        this.encrptPassword = encrptPassword == null ? null : encrptPassword.trim();\r\n    }\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method returns the value of the database column user_password.usr_id\r\n     *\r\n     * @return the value of user_password.usr_id\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public Integer getUsrId() {\r\n        return usrId;\r\n    }\r\n\r\n    /**\r\n     * This method was generated by MyBatis Generator.\r\n     * This method sets the value of the database column user_password.usr_id\r\n     *\r\n     * @param usrId the value for user_password.usr_id\r\n     *\r\n     * @mbg.generated Thu Oct 06 11:16:21 CST 2022\r\n     */\r\n    public void setUsrId(Integer usrId) {\r\n        this.usrId = usrId;\r\n    }\r\n}
+-Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+-<+>UTF-8
+-===================================================================
+-diff --git a/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java b/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java
+---- a/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java	(revision ff7b186e4e75342a7bcbde48834bb7b1bc4e6029)
+-+++ b/BackEnd/src/main/java/org/example/dataobject/PasswordDO.java	(date 1665234021107)
+-@@ -6,7 +6,7 @@
+-      * This field was generated by MyBatis Generator.
+-      * This field corresponds to the database column user_password.id
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     private Integer id;
+- 
+-@@ -15,7 +15,7 @@
+-      * This field was generated by MyBatis Generator.
+-      * This field corresponds to the database column user_password.encrpt_password
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     private String encrptPassword;
+- 
+-@@ -24,7 +24,7 @@
+-      * This field was generated by MyBatis Generator.
+-      * This field corresponds to the database column user_password.usr_id
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     private Integer usrId;
+- 
+-@@ -34,7 +34,7 @@
+-      *
+-      * @return the value of user_password.id
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public Integer getId() {
+-         return id;
+-@@ -46,7 +46,7 @@
+-      *
+-      * @param id the value for user_password.id
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public void setId(Integer id) {
+-         this.id = id;
+-@@ -58,7 +58,7 @@
+-      *
+-      * @return the value of user_password.encrpt_password
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public String getEncrptPassword() {
+-         return encrptPassword;
+-@@ -70,7 +70,7 @@
+-      *
+-      * @param encrptPassword the value for user_password.encrpt_password
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public void setEncrptPassword(String encrptPassword) {
+-         this.encrptPassword = encrptPassword == null ? null : encrptPassword.trim();
+-@@ -82,7 +82,7 @@
+-      *
+-      * @return the value of user_password.usr_id
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public Integer getUsrId() {
+-         return usrId;
+-@@ -94,7 +94,7 @@
+-      *
+-      * @param usrId the value for user_password.usr_id
+-      *
+--     * @mbg.generated Thu Oct 06 11:16:21 CST 2022
+-+     * @mbg.generated Sat Oct 08 21:00:21 CST 2022
+-      */
+-     public void setUsrId(Integer usrId) {
+-         this.usrId = usrId;
+Index: .idea/shelf/_2022_10_10_21_20____.xml
+===================================================================
+diff --git a/.idea/shelf/_2022_10_10_21_20____.xml b/.idea/shelf/_2022_10_10_21_20____.xml
+deleted file mode 100644
+--- a/.idea/shelf/_2022_10_10_21_20____.xml	(revision 615128b96fd1654bca46e35e849fed1b3de5a7b8)
++++ /dev/null	(revision 615128b96fd1654bca46e35e849fed1b3de5a7b8)
+@@ -1,39 +0,0 @@
+-<changelist name="在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]" date="1665408032567" recycled="true" deleted="true">
+-  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/shelved.patch" />
+-  <option name="DESCRIPTION" value="在进行更新之前于 2022/10/10 21:20 取消提交了变更 [变更]" />
+-  <binary>
+-    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/service/impl/UserServiceImpl.class" />
+-    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/service/impl/UserServiceImpl.class" />
+-    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserServiceImpl.class" />
+-  </binary>
+-  <binary>
+-    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/App.class" />
+-    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/App.class" />
+-    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/App.class" />
+-  </binary>
+-  <binary>
+-    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/controller/UserController.class" />
+-    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/controller/UserController.class" />
+-    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserController.class" />
+-  </binary>
+-  <binary>
+-    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/error/EmBusinessError.class" />
+-    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/error/EmBusinessError.class" />
+-    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/EmBusinessError.class" />
+-  </binary>
+-  <binary>
+-    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/dao/UserDOMapper.class" />
+-    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/dao/UserDOMapper.class" />
+-    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserDOMapper.class" />
+-  </binary>
+-  <binary>
+-    <option name="BEFORE_PATH" value=".idea/shelf/在进行更新之前于_2022_10_2_14_49_取消提交了变更_[变更]/UserController.class" />
+-    <option name="AFTER_PATH" />
+-    <option name="SHELVED_PATH" />
+-  </binary>
+-  <binary>
+-    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/service/UserService.class" />
+-    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/service/UserService.class" />
+-    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserService.class" />
+-  </binary>
+-</changelist>
+\ No newline at end of file
+Index: BackEnd/pom.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><project xmlns=\"http://maven.apache.org/POM/4.0.0\"\r\n\txmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n\txsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\r\n\r\n\t<modelVersion>4.0.0</modelVersion>\r\n\t<groupId>org.example</groupId>\r\n\t<artifactId>BackEnd</artifactId>\r\n\t<packaging>jar</packaging>\r\n\t<version>1.0-SNAPSHOT</version>\r\n\t<!-- TODO project name  -->\r\n\t<name>quickstart</name>\r\n\t<description></description>\r\n\r\n\t<!-- TODO\r\n\t\t<organization>\r\n\t\t<name>company name</name>\r\n\t\t<url>company url</url>\r\n\t\t</organization>\r\n\t-->\r\n\r\n\t<!-- 1、引入SpringBoot相关的依赖 -->\r\n\t<parent>\r\n\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t<artifactId>spring-boot-starter-parent</artifactId>\r\n\t\t<version>2.7.4</version>\r\n\t\t<relativePath/> <!-- lookup parent from repository -->\r\n\t</parent>\r\n\r\n\t<licenses>\r\n\t\t<license>\r\n\t\t\t<name>The Apache Software License, Version 2.0</name>\r\n\t\t\t<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>\r\n\t\t\t<distribution>repo</distribution>\r\n\t\t</license>\r\n\t</licenses>\r\n\r\n\t<dependencies>\r\n\t\t<!--  WICKET DEPENDENCIES -->\r\n\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.apache.wicket</groupId>\r\n\t\t\t<artifactId>wicket</artifactId>\r\n\t\t\t<version>${wicket.version}</version>\r\n\t\t</dependency>\r\n\r\n\t\t<!-- 2、 引入SpringBoot的依赖包 -->\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t\t<artifactId>spring-boot-starter</artifactId>\r\n\t\t</dependency>\r\n\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t\t<artifactId>spring-boot-starter-web</artifactId>\r\n\t\t</dependency>\r\n\r\n\t\t<!-- 3、 引入的第三个：java连接mysql的connector的jar包 -->\r\n\t\t<dependency>\r\n\t\t\t<groupId>mysql</groupId>\r\n\t\t\t<artifactId>mysql-connector-java</artifactId>\r\n\t\t</dependency>\r\n\t\t<!-- 4、引入的第四个：阿里的德鲁伊连接池，管理mysql连接的jar包 -->\r\n\t\t<dependency>\r\n\t\t\t<groupId>com.alibaba</groupId>\r\n\t\t\t<artifactId>druid</artifactId>\r\n\t\t\t<version>1.2.13-SNSAPSHOT</version>\r\n\t\t</dependency>\r\n\t\t<!-- 5、引入的第五个：Mybatis相关的jar包 -->\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.mybatis.spring.boot</groupId>\r\n\t\t\t<artifactId>mybatis-spring-boot-starter</artifactId>\r\n\t\t\t<version>2.2.2</version>\r\n\t\t</dependency>\r\n\t\t<!-- 6.Apache common lang -->\r\n\t\t<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.apache.commons</groupId>\r\n\t\t\t<artifactId>commons-lang3</artifactId>\r\n\t\t\t<version>3.12.0</version>\r\n\t\t</dependency>\r\n\r\n\t\t<dependency>\r\n\t\t\t<groupId>javax.validation</groupId>\r\n\t\t\t<artifactId>validation-api</artifactId>\r\n\t\t</dependency>\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.hibernate</groupId>\r\n\t\t\t<artifactId>hibernate-validator</artifactId>\r\n\t\t\t<version>5.2.4.Final</version>\r\n\t\t</dependency>\r\n\t\t<dependency>\r\n\t\t\t<groupId>javax.xml.bind</groupId>\r\n\t\t\t<artifactId>jaxb-api</artifactId>\r\n\t\t</dependency>\r\n\t\t<!-- OPTIONAL \r\n\t\t\t<dependency>\r\n\t\t\t<groupId>org.apache.wicket</groupId>\r\n\t\t\t<artifactId>wicket-extensions</artifactId>\r\n\t\t\t<version>${wicket.version}</version>\r\n\t\t\t</dependency>\r\n\t\t-->\r\n\r\n\t\t<!-- LOGGING DEPENDENCIES - LOG4J -->\r\n\r\n\t\t<dependency>\r\n\t\t\t<groupId>org.slf4j</groupId>\r\n\t\t\t<artifactId>slf4j-log4j12</artifactId>\r\n\t\t\t<version>2.0.1</version>\r\n\t\t</dependency>\r\n\t\t<dependency>\r\n\t\t\t<groupId>log4j</groupId>\r\n\t\t\t<artifactId>log4j</artifactId>\r\n\t\t\t<version>1.2.17</version>\r\n\t\t</dependency>\r\n\r\n\t\t<!--  JUNIT DEPENDENCY FOR TESTING -->\r\n\t\t <dependency>\r\n\t\t\t\t <groupId>junit</groupId>\r\n\t\t\t\t <artifactId>junit</artifactId>\r\n\t\t\t <scope>test</scope>\r\n\t\t </dependency>\r\n\t</dependencies>\r\n\r\n\t<build>\r\n\t\t<resources>\r\n\t\t\t<resource>\r\n\t\t\t\t<filtering>false</filtering>\r\n\t\t\t\t<directory>src/main/resources</directory>\r\n\t\t\t</resource>\r\n\t\t\t<resource>\r\n\t\t\t\t<filtering>false</filtering>\r\n\t\t\t\t<directory>src/main/java</directory>\r\n\t\t\t\t<includes>\r\n\t\t\t\t\t<include>**</include>\r\n\t\t\t\t</includes>\r\n\t\t\t\t<excludes>\r\n\t\t\t\t\t<exclude>**/*.java</exclude>\r\n\t\t\t\t</excludes>\r\n\t\t\t</resource>\r\n\t\t</resources>\r\n\t\t<testResources>\r\n\t\t\t<testResource>\r\n\t\t\t\t<filtering>false</filtering>\r\n\t\t\t\t<directory>src/test/java</directory>\r\n\t\t\t\t<includes>\r\n\t\t\t\t\t<include>**</include>\r\n\t\t\t\t</includes>\r\n\t\t\t\t<excludes>\r\n\t\t\t\t\t<exclude>**/*.java</exclude>\r\n\t\t\t\t</excludes>\r\n\t\t\t</testResource>\r\n\t\t</testResources>\r\n\t\t<plugins>\r\n\r\n\t\t\t<!-- 声明主函数 -->\r\n\t\t\t<plugin>\r\n\t\t\t\t<groupId>org.springframework.boot</groupId>\r\n\t\t\t\t<artifactId>spring-boot-maven-plugin</artifactId>\r\n\t\t\t\t<version>2.7.4</version>\r\n\t\t\t\t<configuration>\r\n\t\t\t\t\t<mainClass>org.example.App</mainClass>\r\n\t\t\t\t</configuration>\r\n\t\t\t</plugin>\r\n\r\n\t\t\t<plugin>\r\n\t\t\t\t<!-- 引入mybatis的plugin -->\r\n\t\t\t\t<groupId>org.mybatis.generator</groupId>\r\n\t\t\t\t<artifactId>mybatis-generator-maven-plugin</artifactId>\r\n\t\t\t\t<version>1.3.5</version>\r\n\r\n\t\t\t\t<dependencies>\r\n\t\t\t\t\t<!-- 7、 第七个引入的：mybatis生成器的core相关jar包  -->\r\n\t\t\t\t\t<dependency>\r\n\t\t\t\t\t\t<groupId>org.mybatis.generator</groupId>\r\n\t\t\t\t\t\t<artifactId>mybatis-generator-core</artifactId>\r\n\t\t\t\t\t\t<version>1.3.5</version>\r\n\t\t\t\t\t</dependency>\r\n\t\t\t\t\t<!-- 8、 在mybatis的插件里再引入一遍mysql的连接jar包 -->\r\n\t\t\t\t\t<!-- 上面曾经引入过，是服务端java代码与mysql连接 -->\r\n\t\t\t\t\t<!-- 这里再次声明，是mybatis插件和mysql连接 -->\r\n\t\t\t\t\t<!-- 虽说老师这么写了， 但我个人觉得没必要重复引入jar包啊 -->\r\n\t\t\t\t\t<!-- 老师给出的解释是：要生成的mybatis插件，需要借助相关的依赖 -->\r\n\t\t\t\t\t<dependency>\r\n\t\t\t\t\t\t<groupId>mysql</groupId>\r\n\t\t\t\t\t\t<artifactId>mysql-connector-java</artifactId>\r\n\t\t\t\t\t\t<version>8.0.21</version>\r\n\t\t\t\t\t</dependency>\r\n\t\t\t\t</dependencies>\r\n\r\n\t\t\t\t<!-- executions : 执行-->\r\n\t\t\t\t<!-- 9、配置mybatis generator 插件的执行阶段phase以及执行目的goal -->\r\n\t\t\t\t<executions>\r\n\t\t\t\t\t<execution>\r\n\t\t\t\t\t\t<id>mybatis generator</id>\r\n\t\t\t\t\t\t<phase>deploy</phase>\r\n\t\t\t\t\t\t<goals>\r\n\t\t\t\t\t\t\t<goal>generate</goal>\r\n\t\t\t\t\t\t</goals>\r\n\t\t\t\t\t</execution>\r\n\t\t\t\t</executions>\r\n\r\n\t\t\t\t<!-- 10、mybatis generator 插件的相关属性配置 -->\r\n\t\t\t\t<configuration>\r\n\t\t\t\t\t<!-- verbose : 冗余的 ， 允许移动生成的文件 -->\r\n\t\t\t\t\t<verbose>true</verbose>\r\n\t\t\t\t\t<!-- 新生成的覆盖旧生成的，实际工作中慎用 -->\r\n\t\t\t\t\t<overwrite>true</overwrite>\r\n\t\t\t\t\t<!-- 指定mybatis配置文件的路径 -->\r\n\t\t\t\t\t<configurationFile>src/main/resources/mybatis-generator.xml</configurationFile>\r\n\t\t\t\t</configuration>\r\n\r\n\t\t\t</plugin>\r\n\r\n\t\t</plugins>\r\n\t</build>\r\n\r\n\t<properties>\r\n\t\t<wicket.version>1.3.2</wicket.version>\r\n\t</properties>\r\n\r\n</project>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BackEnd/pom.xml b/BackEnd/pom.xml
+--- a/BackEnd/pom.xml	(revision 615128b96fd1654bca46e35e849fed1b3de5a7b8)
++++ b/BackEnd/pom.xml	(date 1666944622966)
+@@ -204,7 +204,7 @@
+ 					<!-- verbose : 冗余的 ， 允许移动生成的文件 -->
+ 					<verbose>true</verbose>
+ 					<!-- 新生成的覆盖旧生成的，实际工作中慎用 -->
+-					<overwrite>true</overwrite>
++					<overwrite>false</overwrite>
+ 					<!-- 指定mybatis配置文件的路径 -->
+ 					<configurationFile>src/main/resources/mybatis-generator.xml</configurationFile>
+ 				</configuration>
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ArtifactsWorkspaceSettings\">\r\n    <artifacts-to-build>\r\n      <artifact name=\"PKU-EATER:jar\" />\r\n    </artifacts-to-build>\r\n  </component>\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"NONE\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"72dae969-5783-4578-9b4a-3cefce4e8bd5\" name=\"变更\" comment=\"修复BUG\">\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/pom.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/pom.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/README.md\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/README.md\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"CodeStyleSettingsInfer\">\r\n    <option name=\"done\" value=\"true\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Interface\" />\r\n        <option value=\"Enum\" />\r\n        <option value=\"Class\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"PUSH_TAGS\">\r\n      <GitPushTagMode>\r\n        <option name=\"argument\" value=\"--follow-tags\" />\r\n        <option name=\"title\" value=\"Current Branch\" />\r\n      </GitPushTagMode>\r\n    </option>\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"MavenImportPreferences\">\r\n    <option name=\"generalSettings\">\r\n      <MavenGeneralSettings>\r\n        <option name=\"useMavenConfig\" value=\"true\" />\r\n      </MavenGeneralSettings>\r\n    </option>\r\n  </component>\r\n  <component name=\"ProblemsViewState\">\r\n    <option name=\"selectedTabId\" value=\"CurrentFile\" />\r\n  </component>\r\n  <component name=\"ProjectCodeStyleSettingsMigration\">\r\n    <option name=\"version\" value=\"2\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2FDfFMJt7PKnLyoX2O4JyNnBqjA\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ASKED_SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\n    \"SHARE_PROJECT_CONFIGURATION_FILES\": \"true\",\n    \"last_opened_file_path\": \"D:/big_homework/android/groupwork/ClientEnd\",\n    \"project.structure.last.edited\": \"工件\",\n    \"project.structure.proportion\": \"0.15\",\n    \"project.structure.side.proportion\": \"0.2\",\n    \"settings.editor.selected.configurable\": \"configurable.group.editor\"\n  }\n}]]></component>\r\n  <component name=\"RecentsManager\">\r\n    <key name=\"CreateClassDialog.RecentsKey\">\r\n      <recent name=\"service.impl\" />\r\n    </key>\r\n    <key name=\"CopyFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\java\" />\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\resources\\xml\" />\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\res\" />\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\.idea\" />\r\n    </key>\r\n    <key name=\"MoveFile.RECENT_KEYS\">\r\n      <recent name=\"C:\\Users\\m\\PKU-EATER\\BackEnd\\src\\main\\resources\" />\r\n    </key>\r\n  </component>\r\n  <component name=\"RunAnythingCache\">\r\n    <option name=\"myCommands\">\r\n      <command value=\"mvn clean package -Dmaven.test.skip=true\" />\r\n    </option>\r\n  </component>\r\n  <component name=\"RunManager\" selected=\"应用程序.App\">\r\n    <configuration name=\"App\" type=\"Application\" factoryName=\"Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <option name=\"MAIN_CLASS_NAME\" value=\"org.example.App\" />\r\n      <module name=\"BackEnd\" />\r\n      <extension name=\"coverage\">\r\n        <pattern>\r\n          <option name=\"PATTERN\" value=\"org.example.*\" />\r\n          <option name=\"ENABLED\" value=\"true\" />\r\n        </pattern>\r\n      </extension>\r\n      <method v=\"2\">\r\n        <option name=\"Make\" enabled=\"true\" />\r\n      </method>\r\n    </configuration>\r\n    <configuration name=\"PKU-EATER - 副本.jar\" type=\"JarApplication\" temporary=\"true\">\r\n      <option name=\"JAR_PATH\" value=\"$PROJECT_DIR$/PKU-EATER-jar/PKU-EATER - 副本.jar\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"mybatis-generator\" type=\"MavenRunConfiguration\" factoryName=\"Maven\">\r\n      <MavenSettings>\r\n        <option name=\"myGeneralSettings\" />\r\n        <option name=\"myRunnerSettings\" />\r\n        <option name=\"myRunnerParameters\">\r\n          <MavenRunnerParameters>\r\n            <option name=\"profiles\">\r\n              <set />\r\n            </option>\r\n            <option name=\"goals\">\r\n              <list>\r\n                <option value=\"mybatis-generator:generate\" />\r\n              </list>\r\n            </option>\r\n            <option name=\"pomFileName\" />\r\n            <option name=\"profilesMap\">\r\n              <map />\r\n            </option>\r\n            <option name=\"resolveToWorkspace\" value=\"false\" />\r\n            <option name=\"workingDirPath\" value=\"$PROJECT_DIR$/BackEnd\" />\r\n          </MavenRunnerParameters>\r\n        </option>\r\n      </MavenSettings>\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <list>\r\n      <item itemvalue=\"JAR 应用程序.PKU-EATER - 副本.jar\" />\r\n      <item itemvalue=\"Maven.mybatis-generator\" />\r\n      <item itemvalue=\"应用程序.App\" />\r\n    </list>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"应用程序.App\" />\r\n        <item itemvalue=\"JAR 应用程序.PKU-EATER - 副本.jar\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"应用程序级\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TaskManager\">\r\n    <task active=\"true\" id=\"Default\" summary=\"默认任务\">\r\n      <changelist id=\"72dae969-5783-4578-9b4a-3cefce4e8bd5\" name=\"变更\" comment=\"\" />\r\n      <created>1664031470652</created>\r\n      <option name=\"number\" value=\"Default\" />\r\n      <option name=\"presentableId\" value=\"Default\" />\r\n      <updated>1664031470652</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00001\" summary=\"使用mybatis将本地数据库连接进去了，要改成远程数据库可能需要开放防火墙，之后弄\">\r\n      <created>1664098640925</created>\r\n      <option name=\"number\" value=\"00001\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00001\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664098640925</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00002\" summary=\"成功连接上数据库服务器\">\r\n      <created>1664115561415</created>\r\n      <option name=\"number\" value=\"00002\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00002\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664115561415</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00003\" summary=\"成功连接上数据库服务器\">\r\n      <created>1664692245879</created>\r\n      <option name=\"number\" value=\"00003\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00003\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664692245879</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00004\" summary=\"完成未经优化的注册\">\r\n      <created>1664715937945</created>\r\n      <option name=\"number\" value=\"00004\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00004\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664715937945</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00005\" summary=\"修正了merge导致的错误\">\r\n      <created>1664717820766</created>\r\n      <option name=\"number\" value=\"00005\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00005\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664717820766</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00006\" summary=\"给注册加上了报错\">\r\n      <created>1664787083803</created>\r\n      <option name=\"number\" value=\"00006\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00006\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664787083803</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00007\" summary=\"更新README\">\r\n      <created>1664889901382</created>\r\n      <option name=\"number\" value=\"00007\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00007\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1664889901382</updated>\r\n    </task>\r\n    <task id=\"LOCAL-00008\" summary=\"增加了验证优化，对用户输入进行了限制，优化了错误信息的显示\">\r\n      <created>1665392250374</created>\r\n      <option name=\"number\" value=\"00008\" />\r\n      <option name=\"presentableId\" value=\"LOCAL-00008\" />\r\n      <option name=\"project\" value=\"LOCAL\" />\r\n      <updated>1665392250374</updated>\r\n    </task>\r\n    <option name=\"localTasksCounter\" value=\"9\" />\r\n    <servers />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State>\r\n              <option name=\"FILTERS\">\r\n                <map>\r\n                  <entry key=\"branch\">\r\n                    <value>\r\n                      <list>\r\n                        <option value=\"origin/main\" />\r\n                      </list>\r\n                    </value>\r\n                  </entry>\r\n                </map>\r\n              </option>\r\n            </State>\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"使用mybatis将本地数据库连接进去了，要改成远程数据库可能需要开放防火墙，之后弄\" />\r\n    <MESSAGE value=\"成功连接上数据库服务器\" />\r\n    <MESSAGE value=\"完成未经优化的注册\" />\r\n    <MESSAGE value=\"修正了merge导致的错误\" />\r\n    <MESSAGE value=\"给注册加上了报错\" />\r\n    <MESSAGE value=\"更新README\" />\r\n    <MESSAGE value=\"增加了验证优化，对用户输入进行了限制，优化了错误信息的显示\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"增加了验证优化，对用户输入进行了限制，优化了错误信息的显示\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 615128b96fd1654bca46e35e849fed1b3de5a7b8)
++++ b/.idea/workspace.xml	(date 1667109943973)
+@@ -9,13 +9,19 @@
+     <option name="autoReloadType" value="NONE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="修复BUG">
++    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="修复若干BUG，更新pom.xml打包方法">
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_10_21_20____.xml" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/App.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/EmBusinessError.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserController.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserDOMapper.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserService.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/UserServiceImpl.class" beforeDir="false" />
++      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_10_21_20_取消提交了变更_[变更]/shelved.patch" beforeDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/BackEnd/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/pom.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/UserServiceImpl.java" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/UserDOMapper.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+@@ -42,6 +48,9 @@
+       </GitPushTagMode>
+     </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
++  </component>
++  <component name="HighlightingSettingsPerFile">
++    <setting file="file://$PROJECT_DIR$/BackEnd/src/main/resources/application.properties" root0="FORCE_HIGHLIGHTING" />
+   </component>
+   <component name="MarkdownSettingsMigration">
+     <option name="stateVersion" value="1" />
+@@ -64,17 +73,17 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+-    "last_opened_file_path": "D:/big_homework/android/groupwork/ClientEnd",
+-    "project.structure.last.edited": "工件",
+-    "project.structure.proportion": "0.15",
+-    "project.structure.side.proportion": "0.2",
+-    "settings.editor.selected.configurable": "configurable.group.editor"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
++    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;D:/big_homework/android/PKU-EATER&quot;,
++    &quot;project.structure.last.edited&quot;: &quot;工件&quot;,
++    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
++    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
++    &quot;settings.editor.selected.configurable&quot;: &quot;configurable.group.editor&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RecentsManager">
+     <key name="CreateClassDialog.RecentsKey">
+       <recent name="service.impl" />
+@@ -214,7 +223,14 @@
+       <option name="project" value="LOCAL" />
+       <updated>1665392250374</updated>
+     </task>
+-    <option name="localTasksCounter" value="9" />
++    <task id="LOCAL-00009" summary="修复若干BUG，更新pom.xml打包方法">
++      <created>1665469620031</created>
++      <option name="number" value="00009" />
++      <option name="presentableId" value="LOCAL-00009" />
++      <option name="project" value="LOCAL" />
++      <updated>1665469620031</updated>
++    </task>
++    <option name="localTasksCounter" value="10" />
+     <servers />
+   </component>
+   <component name="Vcs.Log.Tabs.Properties">
+@@ -248,6 +264,7 @@
+     <MESSAGE value="给注册加上了报错" />
+     <MESSAGE value="更新README" />
+     <MESSAGE value="增加了验证优化，对用户输入进行了限制，优化了错误信息的显示" />
+-    <option name="LAST_COMMIT_MESSAGE" value="增加了验证优化，对用户输入进行了限制，优化了错误信息的显示" />
++    <MESSAGE value="修复若干BUG，更新pom.xml打包方法" />
++    <option name="LAST_COMMIT_MESSAGE" value="修复若干BUG，更新pom.xml打包方法" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: BackEnd/src/main/java/org/example/service/model/UserModel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.example.service.model;\r\n\r\n\r\nimport javax.validation.constraints.Max;\r\nimport javax.validation.constraints.Min;\r\nimport javax.validation.constraints.NotBlank;\r\nimport javax.validation.constraints.NotNull;\r\n\r\n//真正层面上处理业务逻辑的核心模型\r\npublic class UserModel {\r\n    private Integer id;\r\n    @NotNull(message = \"用户名不能为空\")\r\n    private String name;\r\n    @NotNull(message = \"性别不能不填写\")\r\n    @Min(value = 1,message = \"性别不合法\")\r\n    @Max(value = 2,message = \"性别不合法\")\r\n    private Integer gender;\r\n    @NotNull(message = \"年龄不能不填写\")\r\n    @Min(value = 0,message = \"年龄必须大于0岁\")\r\n    @Max(value = 100,message = \"年龄必须小于100岁\")\r\n    private Integer age;\r\n    @NotNull(message = \"密码不能为空\")\r\n    private String encrptPassword;\r\n\r\n    public String getEncrptPassword() {\r\n        return encrptPassword;\r\n    }\r\n\r\n    public void setEncrptPassword(String encrptPssword) {\r\n        this.encrptPassword = encrptPssword;\r\n    }\r\n\r\n\r\n    public Integer getId(){\r\n        return id;\r\n    }\r\n\r\n    public void setId(Integer id){\r\n        this.id = id;\r\n    }\r\n\r\n    public String getName(){\r\n        return name;\r\n    }\r\n\r\n    public void setName(String name){\r\n        this.name = name;\r\n    }\r\n\r\n    public Integer getGender(){\r\n        return gender;\r\n    }\r\n\r\n    public void setGender(Integer gender){\r\n        this.gender = gender;\r\n\r\n    }\r\n\r\n    public Integer getAge(){\r\n        return age;\r\n    }\r\n\r\n    public void setAge(Integer age){\r\n        this.age = age;\r\n    }\r\n\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BackEnd/src/main/java/org/example/service/model/UserModel.java b/BackEnd/src/main/java/org/example/service/model/UserModel.java
+--- a/BackEnd/src/main/java/org/example/service/model/UserModel.java	(revision 615128b96fd1654bca46e35e849fed1b3de5a7b8)
++++ b/BackEnd/src/main/java/org/example/service/model/UserModel.java	(date 1667038015822)
+@@ -11,11 +11,11 @@
+     private Integer id;
+     @NotNull(message = "用户名不能为空")
+     private String name;
+-    @NotNull(message = "性别不能不填写")
++    //@NotNull(message = "性别不能不填写")
+     @Min(value = 1,message = "性别不合法")
+     @Max(value = 2,message = "性别不合法")
+     private Integer gender;
+-    @NotNull(message = "年龄不能不填写")
++    //@NotNull(message = "年龄不能不填写")
+     @Min(value = 0,message = "年龄必须大于0岁")
+     @Max(value = 100,message = "年龄必须小于100岁")
+     private Integer age;

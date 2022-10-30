@@ -11,11 +11,9 @@ public class UserModel {
     private Integer id;
     @NotNull(message = "用户名不能为空")
     private String name;
-    @NotNull(message = "性别不能不填写")
     @Min(value = 1,message = "性别不合法")
     @Max(value = 2,message = "性别不合法")
     private Integer gender;
-    @NotNull(message = "年龄不能不填写")
     @Min(value = 0,message = "年龄必须大于0岁")
     @Max(value = 100,message = "年龄必须小于100岁")
     private Integer age;

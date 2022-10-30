@@ -83,23 +83,17 @@ public class UserController extends BaseController {
      * 接收参数统一使用字符串，接收后再进行类型转换
      *
      * @param name      姓名
-     * @param age    年龄
-     * @param gender 性别
      * @param password  密码
      * @return 通用返回对象
      */
     //定义请求的方式（POST而不是GET），以及表单上传编码格式（application/x-www-form-urlencoded）
     @RequestMapping(value = "/register", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
-    public CommonReturnType register(@RequestParam(name="name")String name,
-                                     @RequestParam(name="gender")Integer gender,
-                                     @RequestParam(name="age")Integer age,
-                                     @RequestParam(name="password")String password
+    public CommonReturnType register(@RequestParam(required=false, name="name")String name,
+                                     @RequestParam(required=false, name="password")String password
     ) throws BusinessException{
         UserModel userModel = new UserModel();
         userModel.setName(name);
-        userModel.setGender(gender);
-        userModel.setAge(age);
         //密码按道理是需要加密的，目前暂不加密
         //userModel.setEncrptPassword(MD5Encoder.encode(password.getBytes()));
         userModel.setEncrptPassword(password);
