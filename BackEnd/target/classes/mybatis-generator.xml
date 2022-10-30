@@ -2,6 +2,7 @@
 <!DOCTYPE generatorConfiguration
         PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
         "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
 <generatorConfiguration>
     <context id="DB2Tables" targetRuntime="MyBatis3">
         <!-- 数据库链接地址及连接用户密码 -->
@@ -29,7 +30,7 @@
         </javaClientGenerator>
         <!-- 生成mysql对应表的类名 -->
 
-        <table tableName="user_info" domainObjectName="UserDO"
+        <!--<table tableName="user_info" domainObjectName="UserDO"
                enableCountByExample="false"
                enableUpdateByExample="false"
                enableDeleteByExample="false"
@@ -40,7 +41,14 @@
                enableUpdateByExample="false"
                enableDeleteByExample="false"
                enableSelectByExample="false"
-               selectByExampleQueryId="false"/>
+               selectByExampleQueryId="false"/>-->
+        <table domainObjectName="FoodDO"
+               enableCountByExample="false"
+               enableDeleteByExample="false"
+               enableSelectByExample="false"
+               enableUpdateByExample="false"
+               selectByExampleQueryId="false"
+               tableName="food_item"></table>
 
     </context>
 </generatorConfiguration>
