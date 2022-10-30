@@ -10,7 +10,7 @@ import java.io.IOException
  */
 class LoginDataSource {
 
-    fun login(username: String, password: String): Result<LoggedInUser> {
+    fun login(username: String, password: String,register:Boolean): Result<LoggedInUser> {
         try {
             Log.d("username",username)
             Log.d("password",password)

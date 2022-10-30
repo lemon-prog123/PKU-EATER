@@ -20,6 +20,7 @@ import com.example.activitytest.R
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var loginViewModel: LoginViewModel
+    private lateinit var registerViewModel: LoginViewModel
     private lateinit var binding: ActivityLogin2Binding
     private val permissions = arrayOf(
         android.Manifest.permission.WRITE_EXTERNAL_STORAGE,android.Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -39,9 +40,27 @@ class LoginActivity : AppCompatActivity() {
         val password = binding.password
         val login = binding.login
         val loading = binding.loading
+        val register=binding.register
+
 
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
+        registerViewModel = ViewModelProvider(this, LoginViewModelFactory())
+            .get(LoginViewModel::class.java)
+
+        registerViewModel.loginFormState.observe(this@LoginActivity, Observer {
+            val loginState = it ?: return@Observer
+
+            // disable login button unless both username / password is valid
+            register!!.isEnabled = loginState.isDataValid
+
+            if (loginState.usernameError != null) {
+                username.error = getString(loginState.usernameError)
+            }
+            if (loginState.passwordError != null) {
+                password.error = getString(loginState.passwordError)
+            }
+        })
 
         loginViewModel.loginFormState.observe(this@LoginActivity, Observer {
             val loginState = it ?: return@Observer
@@ -74,13 +93,34 @@ class LoginActivity : AppCompatActivity() {
             //Complete and destroy login activity once successful
         })
 
+        registerViewModel.loginResult.observe(this@LoginActivity, Observer {
+            val loginResult = it ?: return@Observer
+
+            loading.visibility = View.GONE
+            if (loginResult.error != null) {
+
+                showLoginFailed(loginResult.error)
+            }
+            if (loginResult.success != null) {
+                updateUiWithUser(loginResult.success)
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
+            //Complete and destroy login activity once successful
+        })
+
         username.afterTextChanged {
             loginViewModel.loginDataChanged(
                 username.text.toString(),
                 password.text.toString()
             )
         }
-
+        username.afterTextChanged {
+            registerViewModel.loginDataChanged(
+                username.text.toString(),
+                password.text.toString()
+            )
+        }
         password.apply {
             afterTextChanged {
                 loginViewModel.loginDataChanged(
@@ -89,12 +129,31 @@ class LoginActivity : AppCompatActivity() {
                 )
             }
 
+            afterTextChanged {
+                registerViewModel.loginDataChanged(
+                    username.text.toString(),
+                    password.text.toString()
+                )
+            }
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE ->
                         loginViewModel.login(
                             username.text.toString(),
-                            password.text.toString()
+                            password.text.toString(),
+                            false
+                        )
+                }
+                false
+            }
+
+            setOnEditorActionListener { _, actionId, _ ->
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE ->
+                        registerViewModel.login(
+                            username.text.toString(),
+                            password.text.toString(),
+                            true
                         )
                 }
                 false
@@ -102,9 +161,14 @@ class LoginActivity : AppCompatActivity() {
 
             login.setOnClickListener {
                 loading.visibility = View.VISIBLE
-                loginViewModel.login(username.text.toString(), password.text.toString())
+                loginViewModel.login(username.text.toString(), password.text.toString(),false)
+            }
+            register!!.setOnClickListener {
+                loading.visibility = View.VISIBLE
+                registerViewModel.login(username.text.toString(), password.text.toString(),true)
             }
         }
+
     }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
