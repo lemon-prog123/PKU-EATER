@@ -9,15 +9,9 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="数据库内添加了菜品的表单，并在后端添加了菜品相关的创建和浏览逻辑，需要前端关于“添加菜品”的页面（课程进度到4-3）">
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/configurer/PicConfigurer.java" afterDir="false" />
+    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="配置食物图片的url">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/UserModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/model/UserModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/model/UserModel.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -230,7 +224,14 @@
       <option name="project" value="LOCAL" />
       <updated>1667052261137</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="配置食物图片的url">
+      <created>1667115349811</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1667115349811</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -266,6 +267,7 @@
     <MESSAGE value="更新README" />
     <MESSAGE value="增加了验证优化，对用户输入进行了限制，优化了错误信息的显示" />
     <MESSAGE value="数据库内添加了菜品的表单，并在后端添加了菜品相关的创建和浏览逻辑，需要前端关于“添加菜品”的页面（课程进度到4-3）" />
-    <option name="LAST_COMMIT_MESSAGE" value="数据库内添加了菜品的表单，并在后端添加了菜品相关的创建和浏览逻辑，需要前端关于“添加菜品”的页面（课程进度到4-3）" />
+    <MESSAGE value="配置食物图片的url" />
+    <option name="LAST_COMMIT_MESSAGE" value="配置食物图片的url" />
   </component>
 </project>

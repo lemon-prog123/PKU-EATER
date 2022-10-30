@@ -20,7 +20,7 @@
 
 构建方法：点击IDEA右侧栏Maven，依次点开quickstart，生命周期，双击clean等待完成后，再双击package即可。`.jar`包生成在`target`文件夹下。
 
-## 目前的get可用url
+## 可用url
 
 **用户信息查询**
 
@@ -30,17 +30,25 @@
 
 **注册**
 
-`/user/register?name=user2&gender=2&age=2&password=23333`
+`/user/register?name=user2&gender=2`
 
-用户名要求不能重复注册，性别年龄暂不能为空，性别为1（男性）或2（女性），年龄范围0~100
+用户名要求不能重复注册
 
 **登录**
 
 `/user/login?name=user2&password=23333`
 
+**图片url**
+
+图片url的映射文件夹暂时采用绝对路径（见`application.properties`），因为我不会JAVA的相对路径（别在意细节了）
+
+`/foodimg/test.jpg`，其中`test.jpg`替换为对应文件名可访问菜品图片url。
+
 ## 其他运行方式
 
 修改数据库后，需要在构建/运行选项选择mybatis-generator可以生成数据库对应的dataObject类以及Mapper。
+
+请务必确认`pom.xml`中的`<overwrite>`标签为false时再运行。
 
 # 待修复BUG
 
