@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +36,7 @@ public class UserController extends BaseController {
 
     private HttpSession session;
 
-    @RequestMapping("/get")
+    @RequestMapping(value = "/get", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType getUser(@RequestParam(name="id")Integer id) throws BusinessException {
         //调用service服务获取对应id的用户对象并返回给前端
@@ -40,7 +44,6 @@ public class UserController extends BaseController {
 
        //若获取的对应用户信息不存在
         if(userModel == null){
-
             throw new BusinessException(EmBusinessError.USER_NOT_EXIST);
         }
 
@@ -132,6 +135,52 @@ public class UserController extends BaseController {
         session = httpServletRequest.getSession();
         session.setAttribute("IS_LOGIN", true);
         session.setAttribute("LOGIN_USER", userModel);
+
+        // 登录成功，只返回success即可
+        return CommonReturnType.create(null);
+    }
+
+    @RequestMapping(value = "/update", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+    @ResponseBody
+    public CommonReturnType userUpdate(@RequestParam(name="id")Integer id,
+                                       @RequestParam(name="gender")Integer gender,
+                                       @RequestParam(name="birthday")String birthdayString,
+                                       @RequestParam(name="weight")Integer weight,
+                                       @RequestParam(name="height")Integer height,
+                                       @RequestParam(name="avoidance")Integer avoidance,
+                                       @RequestParam(name="budget")Integer budget,
+                                       @RequestParam(name="state")Integer state
+                                       )
+            throws BusinessException{
+        // 入参校验
+
+        // 关于已经登录的一些校验（http的那玩意怎么用啊？？？）
+
+        //主体
+        UserModel userModel = userService.getUserById(id);
+
+        //若获取的对应用户信息不存在,报错
+        if(userModel == null){
+            throw new BusinessException(EmBusinessError.USER_NOT_EXIST);
+        }
+
+        userModel.setGender(gender);
+        DateFormat df=new SimpleDateFormat("yyyy-MM-dd");
+        //DateFormat是抽象类 ，抽象类不可以直接创建对象，所以我们创建子类的对象
+        Date birthday = new Date();
+        try {
+            birthday=df.parse(birthdayString);//这个格式必须按照上面给出的格式进行转化否则出错
+        } catch (ParseException e) {
+            e.printStackTrace();//为啥抛出异常的  不是随便的字符串都可以可以转化为日期吗的
+        }
+        userModel.setBirthday(birthday);
+        userModel.setWeight(weight);
+        userModel.setHeight(height);
+        userModel.setAvoidance(avoidance);
+        userModel.setBudget(budget);
+        userModel.setState(state);
+
+        userService.update(userModel);
 
         // 登录成功，只返回success即可
         return CommonReturnType.create(null);

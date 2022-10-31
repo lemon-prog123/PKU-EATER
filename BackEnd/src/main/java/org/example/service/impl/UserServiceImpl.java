@@ -1,5 +1,6 @@
 package org.example.service.impl;
 
+import org.apache.catalina.User;
 import org.apache.commons.lang3.StringUtils;//注意不是mysql里的StringUtils包
 import org.example.dao.PasswordDOMapper;
 import org.example.dao.UserDOMapper;
@@ -136,5 +137,15 @@ public class UserServiceImpl implements UserService{
 
         //返回用户信息
         return userModel;
+    }
+
+    @Override
+    public void update(UserModel userModel) throws BusinessException{
+        if(userModel == null) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
+        }
+
+        UserDO userDO = convertFromModel(userModel);//将userModel转为数据库可用的userDO
+        userDOMapper.updateByPrimaryKeySelective(userDO);//为null的字段不会修改
     }
 }

@@ -11,4 +11,6 @@ public interface UserService {
     void register(UserModel userModel) throws BusinessException;
 
     UserModel validateLogin(String name, String password) throws BusinessException;
+
+    void update(UserModel userModel) throws BusinessException;
 }

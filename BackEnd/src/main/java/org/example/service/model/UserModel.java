@@ -5,6 +5,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 //真正层面上处理业务逻辑的核心模型
 public class UserModel {
@@ -14,9 +15,20 @@ public class UserModel {
     @Min(value = 1,message = "性别不合法")
     @Max(value = 2,message = "性别不合法")
     private Integer gender;
-    @Min(value = 0,message = "年龄必须大于0岁")
-    @Max(value = 100,message = "年龄必须小于100岁")
-    private Integer age;
+
+    private Date birthday;
+
+    private String intro;
+
+    private Integer weight;
+
+    private Integer height;
+
+    private Integer avoidance;
+
+    private Integer budget;
+
+    private Integer state;
     @NotNull(message = "密码不能为空")
     private String encrptPassword;
 
@@ -54,13 +66,60 @@ public class UserModel {
 
     }
 
-    public Integer getAge(){
-        return age;
+    public Date getBirthday() {
+        return birthday;
     }
 
-    public void setAge(Integer age){
-        this.age = age;
+    public void setBirthday(Date birthday) {
+        this.birthday = birthday;
     }
 
+    public String getIntro() {
+        return intro;
+    }
+
+    public void setIntro(String intro) {
+        this.intro = intro;
+    }
+
+    public Integer getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Integer weight) {
+        this.weight = weight;
+    }
+
+    public Integer getHeight() {
+        return height;
+    }
+
+    public void setHeight(Integer height) {
+        this.height = height;
+    }
+
+    public Integer getAvoidance() {
+        return avoidance;
+    }
+
+    public void setAvoidance(Integer avoidance) {
+        this.avoidance = avoidance;
+    }
+
+    public Integer getBudget() {
+        return budget;
+    }
+
+    public void setBudget(Integer budget) {
+        this.budget = budget;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
+    }
 
 }
