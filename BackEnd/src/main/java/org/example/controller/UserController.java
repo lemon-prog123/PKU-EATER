@@ -143,13 +143,13 @@ public class UserController extends BaseController {
     @RequestMapping(value = "/update", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType userUpdate(@RequestParam(name="id")Integer id,
-                                       @RequestParam(name="gender")Integer gender,
-                                       @RequestParam(name="birthday")String birthdayString,
-                                       @RequestParam(name="weight")Integer weight,
-                                       @RequestParam(name="height")Integer height,
-                                       @RequestParam(name="avoidance")Integer avoidance,
-                                       @RequestParam(name="budget")Integer budget,
-                                       @RequestParam(name="state")Integer state
+                                       @RequestParam(required=false, name="gender")Integer gender,
+                                       @RequestParam(required=false, name="birthday")String birthdayString,
+                                       @RequestParam(required=false, name="weight")Integer weight,
+                                       @RequestParam(required=false, name="height")Integer height,
+                                       @RequestParam(required=false, name="avoidance")Integer avoidance,
+                                       @RequestParam(required=false, name="budget")Integer budget,
+                                       @RequestParam(required=false, name="state")Integer state
                                        )
             throws BusinessException{
         // 入参校验
@@ -182,7 +182,6 @@ public class UserController extends BaseController {
 
         userService.update(userModel);
 
-        // 登录成功，只返回success即可
         return CommonReturnType.create(null);
     }
 }

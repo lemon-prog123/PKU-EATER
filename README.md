@@ -22,11 +22,11 @@
 
 ## 可用url
 
-**用户信息查询**
+**用户信息**
 
 `/user/get?id=1`
 
-目前为调试用，仅仅支持GET表单（浏览器访问）
+返回的信息详见json
 
 **注册**
 
@@ -37,6 +37,28 @@
 **登录**
 
 `/user/login?name=user2&password=23333`
+
+**用户信息修改**
+
+`/user/update`
+
+参数：
+
+id：用户id，除该参数外其余参数均可缺省，该参数不可缺省（即不修改）
+
+gender：性别，int类型
+
+birthday：生日，string类型，格式2002-09-07
+
+weight：体重，int类型
+
+height：身高，int类型
+
+avoidance：忌口，int类型，以二进制串的形式存储每一项忌口
+
+budget：预算，int类型，表示选定的预算方案
+
+state：锻炼状态，int类型，表示选定的锻炼状态
 
 **图片url**
 
@@ -52,6 +74,6 @@
 
 # 待修复BUG
 
-`@NotBlank`无论如何都会报错
+校验中的问题（可不修）：`@NotBlank`无论如何都会报错, 传参缺少的情况下会直接报未知错误，`@NotNull`不生效。
 
-传参缺少的情况下会直接报未知错误，`@NotNull`不生效。
+session的用法（如何产生cookie）
