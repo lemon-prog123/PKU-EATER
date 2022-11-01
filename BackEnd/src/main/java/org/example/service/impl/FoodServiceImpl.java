@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -31,7 +30,6 @@ public class FoodServiceImpl implements FoodService {
         }
         FoodDO foodDO = new FoodDO();
         BeanUtils.copyProperties(itemModel,foodDO);
-        foodDO.setPrice(itemModel.getPrice().doubleValue());
         return foodDO;
     }
 
@@ -67,8 +65,6 @@ public class FoodServiceImpl implements FoodService {
         //将dataobject->Model
         ItemModel itemModel = new ItemModel();
         BeanUtils.copyProperties(foodDO, itemModel);
-        //手动处理价格防止精度问题
-        itemModel.setPrice(new BigDecimal(foodDO.getPrice()));
         return itemModel;
     }
 

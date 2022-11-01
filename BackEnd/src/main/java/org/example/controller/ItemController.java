@@ -7,14 +7,12 @@ import org.example.service.FoodService;
 import org.example.service.model.ItemModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,20 +27,24 @@ public class ItemController extends BaseController{
     //创建菜品的controller
     @RequestMapping(value = "/create", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
-    public CommonReturnType createItem(@RequestParam(name = "title") String title,
-                                       @RequestParam(name = "description") String description,
-                                       @RequestParam(name = "price") BigDecimal price,
-                                       @RequestParam(name = "canteen") String canteen,
-                                       @RequestParam(name = "Calorie") Integer Calorie,
-                                       @RequestParam(name = "imgUrl") String imgUrl) throws BusinessException {
+    public CommonReturnType createItem(@RequestParam(name = "window") Integer window,
+                                       @RequestParam(name = "name") String name,
+                                       @RequestParam(name = "canteen_id") Integer canteen_id,
+                                       @RequestParam(name = "calorie") Integer calorie,
+                                       @RequestParam(name = "avoidance") Integer avoidance,
+                                       @RequestParam(name = "price") Integer price,
+                                       @RequestParam(name = "type") Integer type,
+                                       @RequestParam(name = "imgaddr") String imgaddr) throws BusinessException {
         //封装service请求用来创建菜品
         ItemModel itemModel = new ItemModel();
-        itemModel.setTitle(title);
-        itemModel.setDescription(description);
+        itemModel.setCalorie(calorie);
+        itemModel.setCanteen_id(canteen_id);
         itemModel.setPrice(price);
-        itemModel.setCalorie(Calorie);
-        itemModel.setCanteen(canteen);
-        itemModel.setImgUrl(imgUrl);
+        itemModel.setType(type);
+        itemModel.setName(name);
+        itemModel.setAvoidance(avoidance);
+        itemModel.setImgaddr(imgaddr);  //由于转化DO时会发生错误，所以去掉了下划线
+        itemModel.setWindow(window);
 
         ItemModel itemModelForReturn = foodService.createItem(itemModel);
         ItemVO itemVO = convertVOFromModel(itemModelForReturn);
