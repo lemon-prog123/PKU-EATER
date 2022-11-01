@@ -62,7 +62,7 @@ state：锻炼状态，int类型，表示选定的锻炼状态
 
 **菜品信息修改**
 
-`/user/update`
+`/item/create`
 
 参数：
 
