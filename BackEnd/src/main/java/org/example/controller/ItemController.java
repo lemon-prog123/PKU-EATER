@@ -25,6 +25,20 @@ public class ItemController extends BaseController{
     private FoodService foodService;
 
     //创建菜品的controller
+    /**
+     * 创建菜品接口
+     * 接收参数统一使用字符串，接收后再进行类型转换
+     *
+     * @param window       所在窗口
+     * @param name         名称
+     * @param canteen_id   食堂编号
+     * @param calorie      卡路里
+     * @param avoidance    忌口
+     * @param price        价格
+     * @param type         类型
+     * @param imgaddr      图片地址
+     * @return 通用返回对象
+     */
     @RequestMapping(value = "/create", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType createItem(@RequestParam(name = "window") Integer window,
@@ -62,6 +76,14 @@ public class ItemController extends BaseController{
     }
 
     //菜品详情页浏览
+    /**
+     * 创建菜品详情页浏览接口
+     * 接收参数统一使用字符串，接收后再进行类型转换
+     * 通过编号选择菜品进行详情浏览
+     *
+     * @param       id    编号
+     * @return   通用返回对象
+     */
     @RequestMapping(value = "/get", method = {RequestMethod.GET})
     @ResponseBody
     public CommonReturnType getItem(@RequestParam(name = "id") Integer id) {
@@ -72,13 +94,20 @@ public class ItemController extends BaseController{
         return CommonReturnType.create(itemVO);
     }
 
-    //前端逻辑
-    //商品列表页面浏览
+
+    //菜品列表页面浏览
+    /**
+     * 浏览菜品接口
+     * 接收参数统一使用字符串，接收后再进行类型转换
+     *
+     * @return 通用返回对象
+     */
     @RequestMapping(value = "/list", method = {RequestMethod.GET})
     @ResponseBody
     public CommonReturnType listItem() {
         List<ItemModel> itemModelList = foodService.listItem();
 
+        //使用stream api将list内的itemModel转化为ITEMVO；
         List<ItemVO> itemVOList = itemModelList.stream().map(itemModel -> {
             ItemVO itemVO = this.convertVOFromModel(itemModel);
             return itemVO;

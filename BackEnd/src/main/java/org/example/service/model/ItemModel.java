@@ -109,10 +109,4 @@ public class ItemModel {
         this.type = type;
     }
 
-
-
-
-
-
-
 }

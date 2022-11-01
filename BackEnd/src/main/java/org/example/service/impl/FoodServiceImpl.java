@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FoodServiceImpl implements FoodService {
@@ -53,7 +54,14 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     public List<ItemModel> listItem() {
-        return null;
+        List<FoodDO> foodDOList = foodDOMapper.listItem();
+        List<ItemModel> itemModelList = foodDOList.stream().map(foodDO -> {
+
+            ItemModel itemModel = new ItemModel();
+            BeanUtils.copyProperties(foodDO,itemModel);
+            return itemModel;
+        }).collect(Collectors.toList());
+        return itemModelList;
     }
 
     @Override

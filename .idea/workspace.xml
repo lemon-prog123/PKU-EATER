@@ -9,18 +9,28 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="数据库内添加了菜品的表单，并在后端添加了菜品相关的创建和浏览逻辑，需要前端关于“添加菜品”的页面（课程进度到4-3）">
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/_2022_11_1_11_13____.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_11_1_11_13_取消提交了变更_[变更]/shelved.patch" afterDir="false" />
+    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="根据最新菜品属性表进行了修改">
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/CanteenController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/CanteenVO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/CanteenDOMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/CanteenDO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/CanteenService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/CanteenServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/CanteenModel.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/CanteenDOMapper.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/ItemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/ItemController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/ItemVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/ItemVO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/FoodDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/FoodDOMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/FoodDO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/FoodDO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/FoodServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/FoodServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/ItemModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/ItemModel.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/FoodDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/FoodDOMapper.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mybatis-generator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mybatis-generator.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mybatis-generator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mybatis-generator.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/ItemController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/ItemController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/ItemVO.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/ItemVO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dataobject/FoodDO.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dataobject/FoodDO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/impl/FoodServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/impl/FoodServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/model/ItemModel.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/model/ItemModel.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,8 +43,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
         <option value="Enum" />
+        <option value="Interface" />
         <option value="Class" />
       </list>
     </option>
@@ -261,7 +271,14 @@
       <option name="project" value="LOCAL" />
       <updated>1667236418307</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="根据最新菜品属性表进行了修改">
+      <created>1667277355792</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1667277355792</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -299,6 +316,7 @@
     <MESSAGE value="数据库内添加了菜品的表单，并在后端添加了菜品相关的创建和浏览逻辑，需要前端关于“添加菜品”的页面（课程进度到4-3）" />
     <MESSAGE value="配置食物图片的url" />
     <MESSAGE value="用户信息修改" />
-    <option name="LAST_COMMIT_MESSAGE" value="用户信息修改" />
+    <MESSAGE value="根据最新菜品属性表进行了修改" />
+    <option name="LAST_COMMIT_MESSAGE" value="根据最新菜品属性表进行了修改" />
   </component>
 </project>
