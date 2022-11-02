@@ -60,9 +60,9 @@ budget：预算，int类型，表示选定的预算方案
 
 state：锻炼状态，int类型，表示选定的锻炼状态
 
-**菜品信息修改**
+**菜品信息创建**
 
-`/item/create`
+`/item/create?window=1&name=food1&canteen_id=1&calorie=125&avoidance=1&price=12&type=2`
 
 参数：
 
@@ -84,6 +84,36 @@ imgaddr：图片url，以文件形式存储，string类型
 
 type: 菜品分类，int类型，同样还没有设置范围
 
+**菜品详情浏览**
+
+`/item/get?id=1`
+
+**菜品列表浏览**
+
+`/item/list`
+
+**食堂信息创建**
+
+`/canteen/create?name=nong&intro=good`
+
+参数：
+
+id：食堂id，该参数不可缺省，自增
+
+name：食堂名称，string类型
+
+imgurl：图片url，以文件形式存储，string类型
+
+intro: 食堂简介，string类型
+
+**食堂详情浏览**
+
+`/canteen/get?id=1`
+
+**食堂列表浏览**
+
+`/canteen/list`
+
 **图片url**
 
 图片url的映射文件夹暂时采用绝对路径（见`application.properties`），因为我不会JAVA的相对路径（别在意细节了）
@@ -103,3 +133,5 @@ type: 菜品分类，int类型，同样还没有设置范围
 session的用法（如何产生cookie）
 
 菜品属性中的canteen_id和type需要根据前端设置的选项来设定范围规范输入
+
+菜品和食堂相关还未打包上传服务器，因此功能尚未测试，图片暂时用占位符替代
