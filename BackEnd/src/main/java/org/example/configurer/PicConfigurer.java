@@ -11,10 +11,15 @@ public class PicConfigurer implements WebMvcConfigurer {
     @Value("${out.resource.food.path}")
     private String food_path;
 
+    @Value("${out.resource.canteen.path}")
+    private String canteen_path;
+
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         //配置server虚拟路径，handler为jsp中访问的目录，locations为image相对应的本地路径
-        registry.addResourceHandler("/foodimg/**").addResourceLocations(food_path);
+        registry.addResourceHandler("/img/food/**").addResourceLocations(food_path);
+        //配置server虚拟路径，handler为jsp中访问的目录，locations为image相对应的本地路径
+        registry.addResourceHandler("/img/canteen/**").addResourceLocations(canteen_path);
     }
 
 }

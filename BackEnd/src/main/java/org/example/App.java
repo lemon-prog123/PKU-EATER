@@ -1,7 +1,14 @@
 
 package org.example;
 
+import org.example.controller.CanteenController;
+import org.example.dao.CanteenDOMapper;
+import org.example.dao.FoodDOMapper;
+import org.example.dao.PasswordDOMapper;
 import org.example.dao.UserDOMapper;
+import org.example.dataobject.CanteenDO;
+import org.example.dataobject.FoodDO;
+import org.example.dataobject.PasswordDO;
 import org.example.dataobject.UserDO;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +24,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class App {
 
     @Autowired
-    private UserDOMapper userDOMapper;
+    private PasswordDOMapper foodDOMapper;
 
     @RequestMapping("/")
     public String hello() {
-        UserDO userDO = userDOMapper.selectByPrimaryKey(1);
-        if(userDO == null) {
+        PasswordDO foodDO = foodDOMapper.selectByPrimaryKey(1);
+        if(foodDO == null) {
             return "用户不存在.";
         }
         else {
-            return userDO.getName();
+            return foodDO.getEncrptPassword();
         }
     }
 

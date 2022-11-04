@@ -36,7 +36,7 @@ public class UserController extends BaseController {
 
     private HttpSession session;
 
-    @RequestMapping(value = "/get", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+    @RequestMapping(value = "/get")
     @ResponseBody
     public CommonReturnType getUser(@RequestParam(name="id")Integer id) throws BusinessException {
         //调用service服务获取对应id的用户对象并返回给前端
@@ -117,8 +117,8 @@ public class UserController extends BaseController {
      */
     @RequestMapping(value = "/login", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
-    public CommonReturnType login(@RequestParam(name="name")String name,
-                                  @RequestParam(name="password")String password)
+    public CommonReturnType login(@RequestParam(required=false, name="name")String name,
+                                  @RequestParam(required=false, name="password")String password)
             throws BusinessException{
         // 入参校验
         if (org.apache.commons.lang3.StringUtils.isEmpty(name)
@@ -126,6 +126,8 @@ public class UserController extends BaseController {
         ) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
+
+        System.out.println(name);
 
         // 用户登录服务，校验登录是否合法
         UserModel userModel = userService.validateLogin(name, password);
@@ -137,7 +139,7 @@ public class UserController extends BaseController {
         session.setAttribute("LOGIN_USER", userModel);
 
         // 登录成功，只返回success即可
-        return CommonReturnType.create(null);
+        return CommonReturnType.create(userModel);
     }
 
     @RequestMapping(value = "/update", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})

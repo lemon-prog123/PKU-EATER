@@ -1,13 +1,10 @@
 package org.example.controller;
 
 import org.example.controller.viewobject.CanteenVO;
-import org.example.controller.viewobject.ItemVO;
 import org.example.error.BusinessException;
 import org.example.response.CommonReturnType;
 import org.example.service.CanteenService;
-import org.example.service.FoodService;
 import org.example.service.model.CanteenModel;
-import org.example.service.model.ItemModel;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -79,7 +76,7 @@ public class CanteenController extends BaseController{
 
             CanteenVO canteenVO = convertVOFromModel(canteenModel);
 
-            return CommonReturnType.create(canteenVO);
+            return CommonReturnType.create(canteenModel);
         }
 
     //食堂列表页面浏览
@@ -93,7 +90,6 @@ public class CanteenController extends BaseController{
     @ResponseBody
     public CommonReturnType listCanteen() {
         List<CanteenModel> canteenModelList = canteenService.listCanteen();
-
         //使用stream api将list内的canteenModel转化为CANTEENVO；
         List<CanteenVO> canteenVOList = canteenModelList.stream().map(canteenModel -> {
             CanteenVO canteenVO = this.convertVOFromModel(canteenModel);
@@ -102,6 +98,4 @@ public class CanteenController extends BaseController{
 
         return CommonReturnType.create(canteenVOList);
     }
-
-
 }

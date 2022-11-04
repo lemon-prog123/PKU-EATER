@@ -9,8 +9,51 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="添加了食堂的创建食堂create接口、浏览详情get接口、浏览食堂列表list接口">
+    <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="实现用户信息修改接口">
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/FoodController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/FoodModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_11_1_11_13____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2022_11_1_11_13____.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/App.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/configurer/PicConfigurer.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/configurer/PicConfigurer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/CanteenController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/CanteenController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/ItemController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/CanteenVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/CanteenVO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/ItemVO.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/CanteenDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/CanteenDOMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/FoodDOMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dao/FoodDOMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/CanteenDO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/CanteenDO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/FoodDO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/dataobject/FoodDO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/CanteenService.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/CanteenService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/FoodService.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/FoodService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/CanteenServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/CanteenServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/FoodServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/FoodServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/ItemModel.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/CanteenDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/CanteenDOMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/FoodDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/FoodDOMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mybatis-generator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mybatis-generator.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mapping/CanteenDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mapping/CanteenDOMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mapping/FoodDOMapper.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mapping/FoodDOMapper.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/mybatis-generator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/mybatis-generator.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/App.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/App.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/configurer/PicConfigurer.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/configurer/PicConfigurer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/CanteenController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/CanteenController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/ItemController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/CanteenVO.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/CanteenVO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/ItemVO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/CanteenDOMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/CanteenDOMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/FoodDOMapper.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dao/FoodDOMapper.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dataobject/FoodDO.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/dataobject/FoodDO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/FoodService.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/FoodService.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/impl/CanteenServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/impl/CanteenServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/impl/FoodServiceImpl.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/impl/FoodServiceImpl.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/service/model/ItemModel.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -251,28 +294,14 @@
       <option name="project" value="LOCAL" />
       <updated>1667236418307</updated>
     </task>
-    <task id="LOCAL-00014" summary="根据最新菜品属性表进行了修改">
-      <created>1667277355792</created>
+    <task id="LOCAL-00014" summary="实现用户信息修改接口">
+      <created>1667237143390</created>
       <option name="number" value="00014" />
       <option name="presentableId" value="LOCAL-00014" />
       <option name="project" value="LOCAL" />
-      <updated>1667277355792</updated>
+      <updated>1667237143390</updated>
     </task>
-    <task id="LOCAL-00015" summary="添加了食堂的创建食堂create接口、浏览详情get接口、浏览食堂列表list接口">
-      <created>1667325516225</created>
-      <option name="number" value="00015" />
-      <option name="presentableId" value="LOCAL-00015" />
-      <option name="project" value="LOCAL" />
-      <updated>1667325516225</updated>
-    </task>
-    <task id="LOCAL-00016" summary="添加了食堂的创建食堂create接口、浏览详情get接口、浏览食堂列表list接口">
-      <created>1667327162723</created>
-      <option name="number" value="00016" />
-      <option name="presentableId" value="LOCAL-00016" />
-      <option name="project" value="LOCAL" />
-      <updated>1667327162723</updated>
-    </task>
-    <option name="localTasksCounter" value="17" />
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -310,8 +339,7 @@
     <MESSAGE value="数据库内添加了菜品的表单，并在后端添加了菜品相关的创建和浏览逻辑，需要前端关于“添加菜品”的页面（课程进度到4-3）" />
     <MESSAGE value="配置食物图片的url" />
     <MESSAGE value="用户信息修改" />
-    <MESSAGE value="根据最新菜品属性表进行了修改" />
-    <MESSAGE value="添加了食堂的创建食堂create接口、浏览详情get接口、浏览食堂列表list接口" />
-    <option name="LAST_COMMIT_MESSAGE" value="添加了食堂的创建食堂create接口、浏览详情get接口、浏览食堂列表list接口" />
+    <MESSAGE value="实现用户信息修改接口" />
+    <option name="LAST_COMMIT_MESSAGE" value="实现用户信息修改接口" />
   </component>
 </project>

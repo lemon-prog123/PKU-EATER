@@ -60,55 +60,21 @@ budget：预算，int类型，表示选定的预算方案
 
 state：锻炼状态，int类型，表示选定的锻炼状态
 
-**菜品信息创建**
-
-`/item/create?window=1&name=food1&canteen_id=1&calorie=125&avoidance=1&price=12&type=2`
-
-参数：
-
-id：菜品id，该参数不可缺省，自增
-
-window：窗口号，int类型
-
-name：菜品名称，string类型
-
-canteen_id：所在食堂id，int类型（范围还未进行限制，应根据前端设置的选项设置）
-
-calorie：卡路里，int类型
-
-avoidance：忌口，int类型，以二进制串的形式存储每一项忌口
-
-price：价格，int类型，以分为单位存储，输出时乘100输出，手动加点，避免精度问题
-
-imgaddr：图片url，以文件形式存储，string类型
-
-type: 菜品分类，int类型，同样还没有设置范围
-
 **菜品详情浏览**
 
-`/item/get?id=1`
+`/food/get`
+
+参数：id
 
 **菜品列表浏览**
 
-`/item/list`
-
-**食堂信息创建**
-
-`/canteen/create?name=nong&intro=good`
-
-参数：
-
-id：食堂id，该参数不可缺省，自增
-
-name：食堂名称，string类型
-
-imgurl：图片url，以文件形式存储，string类型
-
-intro: 食堂简介，string类型
+`/food/list`
 
 **食堂详情浏览**
 
-`/canteen/get?id=1`
+`/canteen/get`
+
+参数：id
 
 **食堂列表浏览**
 
@@ -118,7 +84,7 @@ intro: 食堂简介，string类型
 
 图片url的映射文件夹暂时采用绝对路径（见`application.properties`），因为我不会JAVA的相对路径（别在意细节了）
 
-`/foodimg/test.jpg`，其中`test.jpg`替换为对应文件名可访问菜品图片url。
+目前设置了两张图片用于测试，可以访问 `http://47.94.139.212:3000/img/canteen/416.png` 和 `http://47.94.139.212:3000/img/food/416.png` 尝试一下。
 
 ## 其他运行方式
 

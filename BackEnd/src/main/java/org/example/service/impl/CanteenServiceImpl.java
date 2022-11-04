@@ -2,12 +2,10 @@ package org.example.service.impl;
 
 import org.example.dao.CanteenDOMapper;
 import org.example.dataobject.CanteenDO;
-import org.example.dataobject.FoodDO;
 import org.example.error.BusinessException;
 import org.example.error.EmBusinessError;
 import org.example.service.CanteenService;
 import org.example.service.model.CanteenModel;
-import org.example.service.model.ItemModel;
 import org.example.validator.ValidationResult;
 import org.example.validator.ValidatorImpl;
 import org.springframework.beans.BeanUtils;

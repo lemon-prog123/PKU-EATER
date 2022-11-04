@@ -1,0 +1,9 @@
+<changelist name="在进行更新之前于_2022_11_4_13_28_取消提交了变更_[变更]" date="1667539698996" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_11_4_13_28_取消提交了变更_[变更]/shelved.patch" />
+  <option name="DESCRIPTION" value="在进行更新之前于 2022/11/4 13:28 取消提交了变更 [变更]" />
+  <binary>
+    <option name="BEFORE_PATH" value="BackEnd/target/classes/org/example/controller/UserController.class" />
+    <option name="AFTER_PATH" value="BackEnd/target/classes/org/example/controller/UserController.class" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_11_4_13_28_取消提交了变更_[变更]/UserController.class" />
+  </binary>
+</changelist>

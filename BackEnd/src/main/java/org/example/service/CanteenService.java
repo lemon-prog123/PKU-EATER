@@ -2,7 +2,7 @@ package org.example.service;
 
 import org.example.error.BusinessException;
 import org.example.service.model.CanteenModel;
-import org.example.service.model.ItemModel;
+import org.example.service.model.FoodModel;
 
 import java.util.List;
 
