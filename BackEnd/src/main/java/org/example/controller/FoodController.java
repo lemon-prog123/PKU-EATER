@@ -37,4 +37,11 @@ public class FoodController extends BaseController{
         List<FoodModel> foodModelList = foodService.listFood();
         return CommonReturnType.create(foodModelList);
     }
+
+    @RequestMapping(value = "/listbycanteen", method = {RequestMethod.GET})
+    @ResponseBody
+    public CommonReturnType ListFoodByCanteen(@RequestParam(name = "id") Integer canteen_id) {
+        List<FoodModel> foodModelList = foodService.listFoodByCanteen(canteen_id);
+        return CommonReturnType.create(foodModelList);
+    }
 }

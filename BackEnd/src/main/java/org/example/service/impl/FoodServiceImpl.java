@@ -40,6 +40,18 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
+    public List<FoodModel> listFoodByCanteen(Integer canteen_id) {
+        List<FoodDO> canteenDOList = foodDOMapper.listFoodByCanteen(canteen_id);
+        List<FoodModel> canteenModelList = canteenDOList.stream().map(canteenDO -> {
+
+            FoodModel canteenModel = new FoodModel();
+            BeanUtils.copyProperties(canteenDO,canteenModel);
+            return canteenModel;
+        }).collect(Collectors.toList());
+        return canteenModelList;
+    }
+
+    @Override
     public FoodModel getFoodById(Integer id) {
         FoodDO foodDO = foodDOMapper.selectByPrimaryKey(id);
         if (foodDO == null) {

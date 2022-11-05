@@ -193,4 +193,12 @@
   <select id="listFood" resultType="org.example.dataobject.FoodDO" resultMap="BaseResultMap">
     select * from food_item;
   </select>
+
+  <select id="listFoodByCanteen" parameterType="java.lang.Integer"
+          resultType="org.example.dataobject.FoodDO" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from food_item
+    where canteen_id = #{canteen_id,jdbcType=INTEGER}
+  </select>
 </mapper>
