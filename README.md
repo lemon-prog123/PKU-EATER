@@ -88,6 +88,28 @@ state：锻炼状态，int类型，表示选定的锻炼状态
 
 `/canteen/list`
 
+**添加日志**
+
+参数：
+
+uid：用户id
+
+fid：食物id
+
+若fid为0，则需填入calorie和price
+
+`/journal/create?uid=1&fid=0&calorie=88&price=12345`
+
+若fid为已有菜品id，则后两项自动填充
+
+`/journal/create?uid=1&fid=1`
+
+**展示特定用户的日志**
+
+参数：uid
+
+`/journal/listbyusr?uid=12`
+
 **图片url**
 
 图片url的映射文件夹暂时采用绝对路径（见`application.properties`），因为我不会JAVA的相对路径（别在意细节了）
@@ -108,4 +130,3 @@ session的用法（如何产生cookie）
 
 菜品属性中的canteen_id和type需要根据前端设置的选项来设定范围规范输入
 
-菜品和食堂相关还未打包上传服务器，因此功能尚未测试，图片暂时用占位符替代
