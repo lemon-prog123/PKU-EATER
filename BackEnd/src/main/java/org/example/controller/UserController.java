@@ -60,6 +60,8 @@ public class UserController extends BaseController {
         }
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userModel, userVO);
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+        userVO.setBirthday(sf.format(userModel.getBirthday()));
         return userVO;
     }
 

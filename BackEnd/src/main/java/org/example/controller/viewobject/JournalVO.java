@@ -3,18 +3,18 @@ package org.example.controller.viewobject;
 import java.util.Date;
 
 public class JournalVO {
-    private Date datetime;
+    private String datetime;
 
     private Integer fid;
 
     private Integer calorie;
 
 
-    public Date getDatetime() {
+    public String getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(Date datetime) {
+    public void setDatetime(String datetime) {
         this.datetime = datetime;
     }
 

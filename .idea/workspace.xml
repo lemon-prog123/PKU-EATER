@@ -10,18 +10,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="72dae969-5783-4578-9b4a-3cefce4e8bd5" name="变更" comment="添加了食堂的创建食堂create接口、浏览详情get接口、浏览食堂列表list接口">
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/JournalController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/JournalVO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/JournalService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/impl/JournalServiceImpl.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/service/model/JournalModel.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mapping/JournalDOMapper.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_10_30_14_17____.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_11_4_13_28____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2022_11_4_13_28____.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_10_30_14_17_取消提交了变更_[变更]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_11_1_11_13____.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2022_11_2_11_39____.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/_2022_11_2_11_39____.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2022_11_1_11_13_取消提交了变更_[变更]/shelved.patch" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/resources/mybatis-generator.xml" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/resources/mybatis-generator.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/JournalController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/JournalController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/JournalVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/JournalVO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/UserVO.java" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/src/main/java/org/example/controller/viewobject/UserVO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/JournalController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/JournalController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/UserController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/JournalVO.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/JournalVO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/UserVO.class" beforeDir="false" afterPath="$PROJECT_DIR$/BackEnd/target/classes/org/example/controller/viewobject/UserVO.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -77,18 +78,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "last_opened_file_path": "D:/PKU-EATER",
-    "project.structure.last.edited": "SDK",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "File.Encoding"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/PKU-EATER&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;SDK&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;File.Encoding&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="service.impl" />

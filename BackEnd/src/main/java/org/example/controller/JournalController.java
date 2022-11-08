@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,8 +65,7 @@ public class JournalController extends BaseController{
      *
      * @return 通用返回对象
      */
-    //@RequestMapping(value = "/create", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
-    @RequestMapping(value = "/create", method = {RequestMethod.GET})
+    @RequestMapping(value = "/create", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
     @ResponseBody
     public CommonReturnType createJournal(@RequestParam(name = "uid") Integer uid,
                                           @RequestParam(name = "fid") Integer fid,
@@ -84,7 +84,7 @@ public class JournalController extends BaseController{
         else{
             FoodModel foodModel = foodService.getFoodById(fid);
             journalModel.setCalorie(foodModel.getCalorie());
-           journalModel.setPrice(foodModel.getPrice());
+            journalModel.setPrice(foodModel.getPrice());
         }
 
         JournalModel journalModelForReturn = journalService.createJournal(journalModel);
@@ -99,7 +99,8 @@ public class JournalController extends BaseController{
         }
         JournalVO journalVO = new JournalVO();
         BeanUtils.copyProperties(journalModel, journalVO);
-        journalVO.setDatetime(journalModel.getDatetime());
+        SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        journalVO.setDatetime(sf.format(journalModel.getDatetime()));
         return journalVO;
     }
 
