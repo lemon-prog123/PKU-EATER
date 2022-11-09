@@ -65,7 +65,8 @@ public class JournalController extends BaseController{
      *
      * @return 通用返回对象
      */
-    @RequestMapping(value = "/create", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+    //@RequestMapping(value = "/create", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+    @RequestMapping(value = "/create")
     @ResponseBody
     public CommonReturnType createJournal(@RequestParam(name = "uid") Integer uid,
                                           @RequestParam(name = "fid") Integer fid,

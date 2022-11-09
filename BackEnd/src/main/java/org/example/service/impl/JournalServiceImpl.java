@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,14 +30,25 @@ public class JournalServiceImpl implements JournalService {
 
     @Override
     public List<JournalModel> ListJournalByUsrId(Integer uid) {
-            List<JournalDO> journalDOList = journalDOMapper.ListJournalByUsrId(uid);
-            List<JournalModel> journalModelList = journalDOList.stream().map(journalDO -> {
+        List<JournalDO> journalDOList = journalDOMapper.ListJournalByUsrId(uid);
+        List<JournalModel> journalModelList = new ArrayList<JournalModel>();
 
+        Date nowTime = new Date();
+        long nowTimeGet = nowTime.getTime();
+
+        for(JournalDO journalDO: journalDOList) {
+            long diff = nowTimeGet - journalDO.getDatetime().getTime();
+            long diffDays = diff / (24 * 60 * 60 * 1000);
+            if(diffDays <= 30) { //只保留30天内的记录
                 JournalModel journalModel = new JournalModel();
                 BeanUtils.copyProperties(journalDO,journalModel);
-                return journalModel;
-            }).collect(Collectors.toList());
-            return journalModelList;
+                journalModelList.add(journalModel);
+            }
+            else {//删除超过30天的记录
+                journalDOMapper.deleteByPrimaryKey(journalDO.getId());
+            }
+        }
+        return journalModelList;
     }
 
     @Override
