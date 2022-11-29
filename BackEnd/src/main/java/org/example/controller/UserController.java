@@ -105,7 +105,9 @@ public class UserController extends BaseController {
 
         userService.register(userModel);
 
-        return CommonReturnType.create(null);
+        UserVO userVO =  convertFromModel(userModel);
+
+        return CommonReturnType.create(userVO);
     }
 
     //用户登录接口
@@ -129,8 +131,6 @@ public class UserController extends BaseController {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
 
-        System.out.println(name);
-
         // 用户登录服务，校验登录是否合法
         UserModel userModel = userService.validateLogin(name, password);
 
@@ -140,8 +140,10 @@ public class UserController extends BaseController {
         session.setAttribute("IS_LOGIN", true);
         session.setAttribute("LOGIN_USER", userModel);
 
+        UserVO userVO =  convertFromModel(userModel);
+
         // 登录成功，只返回success即可
-        return CommonReturnType.create(userModel);
+        return CommonReturnType.create(userVO);
     }
 
     @RequestMapping(value = "/update", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
@@ -157,8 +159,6 @@ public class UserController extends BaseController {
                                        )
             throws BusinessException{
         // 入参校验
-
-        // 关于已经登录的一些校验（http的那玩意怎么用啊？？？）
 
         //主体
         UserModel userModel = userService.getUserById(id);
@@ -186,6 +186,8 @@ public class UserController extends BaseController {
 
         userService.update(userModel);
 
-        return CommonReturnType.create(null);
+        UserVO userVO =  convertFromModel(userModel);
+
+        return CommonReturnType.create(userVO);
     }
 }

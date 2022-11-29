@@ -53,7 +53,7 @@ public class JournalServiceImpl implements JournalService {
 
     @Override
     @Transactional
-    public JournalModel createJournal(JournalModel journalModel) throws BusinessException {
+    public void createJournal(JournalModel journalModel) throws BusinessException {
         //校验入参
         ValidationResult result = validator.validate(journalModel);
         if(result.isHasErrors()){
@@ -64,10 +64,6 @@ public class JournalServiceImpl implements JournalService {
 
         //写入数据库
         journalDOMapper.insertSelective(journalDO);
-        journalModel.setId(journalDO.getId());
-
-        //返回创建完成的对象
-        return this.getJournalById(journalModel.getId());
     }
 
     @Override

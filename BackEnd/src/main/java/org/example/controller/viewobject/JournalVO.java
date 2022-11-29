@@ -9,6 +9,8 @@ public class JournalVO {
 
     private Integer calorie;
 
+    private Integer meal;
+
 
     public String getDatetime() {
         return datetime;
@@ -44,6 +46,12 @@ public class JournalVO {
 
     private Integer price;
 
+    public Integer getMeal() {
+        return meal;
+    }
 
+    public void setMeal(Integer meal) {
+        this.meal = meal;
+    }
 
 }

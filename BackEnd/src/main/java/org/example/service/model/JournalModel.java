@@ -15,6 +15,8 @@ public class JournalModel {
 
     private Integer price;
 
+    private Integer meal;
+
     public Integer getId() {
         return id;
     }
@@ -63,9 +65,12 @@ public class JournalModel {
         this.price = price;
     }
 
+    public Integer getMeal() {
+        return meal;
+    }
 
-
-
-
+    public void setMeal(Integer meal) {
+        this.meal = meal;
+    }
 
 }

@@ -104,7 +104,9 @@ uid：用户id
 
 fid：食物id
 
-若fid为0，则需填入calorie和price
+meal:早/中/晚/加餐，int类型
+
+若fid为0，表示自定义食物，则需填入calorie和price
 
 `/journal/create?uid=1&fid=0&calorie=88&price=12345`
 

@@ -10,7 +10,7 @@ import java.util.List;
 public interface JournalService {
     List<JournalModel> ListJournalByUsrId(Integer uid);
 
-    JournalModel createJournal(JournalModel journalModel) throws BusinessException;
+    void createJournal(JournalModel journalModel) throws BusinessException;
 
     JournalModel getJournalById(Integer id);
 }

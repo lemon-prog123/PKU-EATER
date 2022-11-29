@@ -69,12 +69,14 @@ public class JournalController extends BaseController{
     @ResponseBody
     public CommonReturnType createJournal(@RequestParam(name = "uid") Integer uid,
                                           @RequestParam(name = "fid") Integer fid,
+                                          @RequestParam(name = "meal") Integer meal,
                                           @RequestParam(required=false, name = "calorie") Integer calorie,
                                           @RequestParam(required=false, name = "price") Integer price) throws BusinessException {
         //封装service请求用来增加日志
         JournalModel journalModel = new JournalModel();
         journalModel.setUid(uid);
         journalModel.setFid(fid);
+        journalModel.setMeal(meal);
 
         //自定义
         if(journalModel.getFid() == 0){
@@ -87,10 +89,9 @@ public class JournalController extends BaseController{
             journalModel.setPrice(foodModel.getPrice());
         }
 
-        JournalModel journalModelForReturn = journalService.createJournal(journalModel);
-        JournalVO journalVO = convertVOFromModel(journalModelForReturn);
-        return CommonReturnType.create(journalVO);
+        journalService.createJournal(journalModel);
 
+        return CommonReturnType.create(null);
     }
 
     private JournalVO convertVOFromModel(JournalModel journalModel) {
