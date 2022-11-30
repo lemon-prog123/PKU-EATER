@@ -105,7 +105,8 @@ public class JournalController extends BaseController{
         return journalVO;
     }
 
-    @RequestMapping(value = "/delete", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+    //@RequestMapping(value = "/delete", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+    @RequestMapping(value = "/delete")
     @ResponseBody
     public CommonReturnType deleteJournel(@RequestParam(name = "id") Integer id,
                                           @RequestParam(name = "uid") Integer uid

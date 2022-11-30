@@ -93,6 +93,7 @@ public class UserController extends BaseController {
      */
     //定义请求的方式（POST而不是GET），以及表单上传编码格式（application/x-www-form-urlencoded）
     @RequestMapping(value = "/register", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+    //@RequestMapping(value = "/register")
     @ResponseBody
     public CommonReturnType register(@RequestParam(required=false, name="name")String name,
                                      @RequestParam(required=false, name="password")String password
@@ -103,8 +104,8 @@ public class UserController extends BaseController {
         //userModel.setEncrptPassword(MD5Encoder.encode(password.getBytes()));
         userModel.setEncrptPassword(password);
 
-        userService.register(userModel);
-
+        Integer id = userService.register(userModel);
+        userModel = userService.getUserById(id);
         UserVO userVO =  convertFromModel(userModel);
 
         return CommonReturnType.create(userVO);
@@ -147,6 +148,7 @@ public class UserController extends BaseController {
     }
 
     @RequestMapping(value = "/update", method = {RequestMethod.POST}, consumes = {CONTENT_TYPE_FORMED})
+    //@RequestMapping(value = "/update")
     @ResponseBody
     public CommonReturnType userUpdate(@RequestParam(name="id")Integer id,
                                        @RequestParam(required=false, name="gender")Integer gender,
@@ -186,6 +188,7 @@ public class UserController extends BaseController {
 
         userService.update(userModel);
 
+        userModel = userService.getUserById(id);
         UserVO userVO =  convertFromModel(userModel);
 
         return CommonReturnType.create(userVO);

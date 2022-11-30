@@ -81,7 +81,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional //同一事务，防止什么用户表插进去了password没插进去
-    public void register(UserModel userModel) throws BusinessException{
+    public Integer register(UserModel userModel) throws BusinessException{
         if(userModel == null) {
             throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR);
         }
@@ -118,6 +118,7 @@ public class UserServiceImpl implements UserService{
 
         PasswordDO passwordDO = convertPasswordFromModel(userModel);
         passwordDOMapper.insertSelective(passwordDO);
+        return userModel.getId();
     }
 
     @Override
