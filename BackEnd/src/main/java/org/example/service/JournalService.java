@@ -12,5 +12,7 @@ public interface JournalService {
 
     void createJournal(JournalModel journalModel) throws BusinessException;
 
+    void deleteJournal(Integer id, Integer uid) throws BusinessException;
+
     JournalModel getJournalById(Integer id);
 }

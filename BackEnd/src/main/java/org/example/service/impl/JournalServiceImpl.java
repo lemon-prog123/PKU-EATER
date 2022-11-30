@@ -67,6 +67,21 @@ public class JournalServiceImpl implements JournalService {
     }
 
     @Override
+    @Transactional
+    public void deleteJournal(Integer id, Integer uid) throws BusinessException {
+        //校验合法性
+        JournalModel journalModel = getJournalById(id);
+        if(journalModel == null) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"日志id不存在");
+        }
+        if(journalModel.getUid() != uid) {
+            throw new BusinessException(EmBusinessError.PARAMETER_VALIDATION_ERROR,"这不是您的日志，没有删除权限");
+        }
+        //删除日志
+        journalDOMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
     public JournalModel getJournalById(Integer id) {
         JournalDO journalDO = journalDOMapper.selectByPrimaryKey(id);
         if (journalDO == null) {

@@ -3,6 +3,7 @@ package org.example.controller.viewobject;
 import java.util.Date;
 
 public class JournalVO {
+    private Integer id;
     private String datetime;
 
     private Integer fid;
@@ -11,7 +12,13 @@ public class JournalVO {
 
     private Integer meal;
 
+    public Integer getId() {
+        return id;
+    }
 
+    public void setId(Integer id) {
+        this.id = id;
+    }
     public String getDatetime() {
         return datetime;
     }

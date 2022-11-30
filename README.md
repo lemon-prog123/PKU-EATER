@@ -120,6 +120,12 @@ meal:早/中/晚/加餐，int类型
 
 `/journal/listbyusr?uid=12`
 
+**删除日志**
+
+参数：id，uid。id为唯一标识日志号，可以通过listbyusr获得，uid为用户id，用于验证删除权限（假装这是个安全的cookie）
+
+`/journal/delete?uid=1&id=48`
+
 # 其他
 
 **图片url**
