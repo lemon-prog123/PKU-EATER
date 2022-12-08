@@ -144,11 +144,3 @@ meal:早/中/晚/加餐，int类型
 
 请务必确认`pom.xml`中的`<overwrite>`标签为false时再运行。
 
-# 待修复BUG
-
-校验中的问题（可不修）：`@NotBlank`无论如何都会报错, 传参缺少的情况下会直接报未知错误，`@NotNull`不生效。
-
-session的用法（如何产生cookie）
-
-菜品属性中的canteen_id和type需要根据前端设置的选项来设定范围规范输入
-
